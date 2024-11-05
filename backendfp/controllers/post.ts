@@ -67,8 +67,10 @@ export const showAllPosts = async (
     }
     const posts = await Post.find();
     res.status(201).json({ posts });
-  } catch (error) {
-    res.status(500).json({ message: "error while fetching posts" });
+    return;
+  } catch (error: any) {
+    res.status(500).send(error.message);
+    return;
   }
 };
 
@@ -93,11 +95,13 @@ export const showOwnPosts = async (
       res
         .status(200)
         .json({ message: "No posts created by you", posts: user.posts });
+      return;
     }
     res.status(200).json({ message: "Your posts", posts: user.posts });
     return;
-  } catch (error) {
-    res.status(500).json({ message: "error while fetching posts" });
+  } catch (error: any) {
+    res.status(500).send(error.message);
+    return;
   }
 };
 
@@ -128,6 +132,7 @@ export const postById = async (req: CustomRequest, res: Response) => {
   } catch (error: any) {
     console.error("Error while fetching post:", error.message);
     res.status(500).json({ message: "Error while fetching post" });
+    return;
   }
 };
 
@@ -152,7 +157,7 @@ export const postByUser = async (req: CustomRequest, res: Response) => {
       res.status(200).json({ message: `No posts created by user ${id}` });
       return;
     }
-    res.status(200).json({ message: "post of user ${id}", posts });
+    res.status(200).json({ message: `post of user ${id}`, posts });
     return;
   } catch (error) {
     res.status(500).json({ message: "error while fetching posts" });
@@ -160,7 +165,6 @@ export const postByUser = async (req: CustomRequest, res: Response) => {
   }
 };
 
-//не работает
 export const postsByFollowings = async (req: CustomRequest, res: Response) => {
   const userId = req.user?.id;
   console.log(userId);
@@ -193,7 +197,7 @@ export const postsByFollowings = async (req: CustomRequest, res: Response) => {
     res.status(200).json({ posts });
     return;
   } catch (error) {
-    res.status(500).json({ message: "error while fetching posts" });
+    res.status(500).json({ message: "error while fetching posts in catch" });
     return;
   }
 };
@@ -245,6 +249,7 @@ export const deletePost = async (req: CustomRequest, res: Response) => {
     return;
   } catch (error: any) {
     res.status(500).json({ message: "Error while deleting post" });
+    return;
   }
 };
 

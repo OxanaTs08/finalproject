@@ -23,7 +23,7 @@ router.get("/showall", authenticateJWT, showAllPosts);
 router.get("/showown", authenticateJWT, showOwnPosts);
 router.get("/:id", authenticateJWT, postById);
 router.get("/user/:id", authenticateJWT, postByUser);
-router.get("/postsbyfollowings", authenticateJWT, postsByFollowings);
+router.get("/all/byourfollowings", authenticateJWT, postsByFollowings);
 router.delete("/delete/:id", authenticateJWT, deletePost);
 router.put("/update/:id", authenticateJWT, updatePost);
 router.put("/like/:postId", authenticateJWT, createLike);

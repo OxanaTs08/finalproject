@@ -4,11 +4,11 @@ interface IUser extends Document {
   email: string;
   password: string;
   avatarUrl?: string;
+  description?: string;
   followers: mongoose.Types.ObjectId[];
   followings: mongoose.Types.ObjectId[];
   posts: mongoose.Types.ObjectId[];
   savedPosts: mongoose.Types.ObjectId[];
-  stories: mongoose.Types.ObjectId[];
   yourLikes: mongoose.Types.ObjectId[];
   comments: mongoose.Types.ObjectId[];
   createdAt: Date;
@@ -32,6 +32,7 @@ const userSchema: Schema<IUser> = new Schema(
       minlength: [6, "Password must contain at least 6 characters"],
     },
     avatarUrl: { type: String, default: null },
+    description: { type: String, default: null },
     followers: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -54,12 +55,6 @@ const userSchema: Schema<IUser> = new Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Post",
-      },
-    ],
-    stories: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Story",
       },
     ],
     yourLikes: [

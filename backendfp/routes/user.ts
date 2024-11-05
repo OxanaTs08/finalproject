@@ -12,6 +12,7 @@ import {
   showYourLikes,
   showAllExceptCurrentUser,
   // logoutController,
+  showUser,
 } from "../controllers/user";
 import authenticateJWT from "../middleWares/authMiddleWare";
 
@@ -26,6 +27,7 @@ router.get(
   showAllExceptCurrentUser
 );
 router.get("/:id", authenticateJWT, showUserById);
+router.post("/showone/bybody", authenticateJWT, showUser);
 router.put("/following/:followingId", authenticateJWT, toFollow);
 router.get("/following/ownfollowing", authenticateJWT, showOwnFollowings);
 router.get("/followers/ownfollowers", authenticateJWT, showownFollowers);

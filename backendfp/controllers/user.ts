@@ -150,6 +150,27 @@ export const showUserById: RequestHandler = async (req, res) => {
   }
 };
 
+export const showUser: RequestHandler = async (req, res) => {
+  try {
+    const id = req.body;
+    if (!id) {
+      res.status(400).json({ message: "User id is missing " });
+      return;
+    }
+    const user = await User.findById(id);
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+    res.status(200).json({ user });
+    return;
+  } catch (error: any) {
+    console.error("Error fetching user:", error);
+    res.status(500).send(error.message);
+    return;
+  }
+};
+
 export const updateUser = async (req: CustomRequest, res: Response) => {
   try {
     const userId = req.user?.id;

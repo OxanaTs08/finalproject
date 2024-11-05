@@ -48,7 +48,7 @@ const postSchema: Schema<IPost> = new Schema(
     ],
   },
   {
-    timestamps: true, // добавляет поля createdAt и updatedAt
+    timestamps: true,
   }
 );
 

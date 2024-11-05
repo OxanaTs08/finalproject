@@ -1,8 +1,8 @@
 import { Box, Typography, TextField, styled, Stack } from "@mui/material";
 import { NavLink } from "react-router-dom";
-import MainButton from "./MainButton";
+import MainButton from "../components/MainButton";
 import { useNavigate } from "react-router-dom";
-import DialogWindow from "./DialogWindow";
+import DialogWindow from "../components/DialogWindow";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -27,7 +27,7 @@ const StyledNavLink = styled(NavLink)(() => ({
   },
 }));
 
-const RegistrationBlock: React.FC = () => {
+const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   // const dispatch = useDispatch();
   const dispatch = useAppDispatch();
@@ -217,7 +217,7 @@ const RegistrationBlock: React.FC = () => {
           <Typography color="#000000" sx={{ textAlign: "center" }}>
             Have an account
           </Typography>{" "}
-          <StyledNavLink to="/login">
+          <StyledNavLink to="/s">
             {" "}
             <Typography color="#0095F6" sx={{ textAlign: "center" }}>
               Sign In
@@ -229,4 +229,4 @@ const RegistrationBlock: React.FC = () => {
   );
 };
 
-export default RegistrationBlock;
+export default RegisterPage;

@@ -130,6 +130,28 @@ export const userById = createAsyncThunk(
   }
 );
 
+export const userByIdBody = createAsyncThunk(
+  "user/showone/bybody",
+  async (id: string, { getState, rejectWithValue }) => {
+    try {
+      const token =
+        (getState() as RootState).users.token || localStorage.getItem("token");
+      if (!token) {
+        return rejectWithValue("Authorization token is missing");
+      }
+      const response = await axios.post(`${API_URL}/showone/bybody`, {
+        body: { id },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data.user;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
 export const createFollowing = createAsyncThunk<IUser, { followingId: string }>(
   "user/following/:followingId",
   async ({ followingId }, { getState, rejectWithValue }) => {
@@ -286,7 +308,19 @@ export const userSlice = createSlice({
         state.isError = true;
         state.message = (action.payload as string) || "Failed to fetch user";
       })
-      .addCase(allUsers.pending, (state) => {
+      .addCase(
+        userByIdBody.fulfilled,
+        (state, action: PayloadAction<IUser>) => {
+          state.isLoading = false;
+          state.user = action.payload;
+        }
+      )
+      .addCase(userByIdBody.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = (action.payload as string) || "Failed to fetch user";
+      })
+      .addCase(userByIdBody.pending, (state) => {
         state.isLoading = true;
         state.isError = false;
         state.message = null;

@@ -67,7 +67,7 @@ const LogInPage = () => {
     if (token || savedToken) {
       dispatch(resetState());
       const timer = setTimeout(() => {
-        navigate("/listusers");
+        navigate("/MainPage");
       }, 1000);
       return () => clearTimeout(timer);
     }
