@@ -37,6 +37,8 @@ const PostCard = ({ post }: { post: IPost }) => {
   const user = post.user;
   const username = user?.username;
 
+  const handleLike = () => {};
+
   return (
     <>
       <Card sx={{ maxWidth: 345 }}>
@@ -58,7 +60,11 @@ const PostCard = ({ post }: { post: IPost }) => {
           />
         </StyledNavLink>
         <CardActions disableSpacing>
-          <IconButton aria-label="add to favorites">
+          <IconButton
+            aria-label="like"
+            onClick={handleLike}
+            // color={isLiked ? "error" : "default"}
+          >
             <FavoriteIcon />
           </IconButton>
           <IconButton aria-label="comment">

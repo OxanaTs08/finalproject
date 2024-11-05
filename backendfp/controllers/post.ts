@@ -279,10 +279,66 @@ export const updatePost = async (req: CustomRequest, res: Response) => {
   }
 };
 
+// export const createLike = async (req: CustomRequest, res: Response) => {
+//   try {
+//     const userId = req.user?.id;
+//     const { postId } = req.params;
+
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       res.status(404).json({ message: "user not found" });
+//       return;
+//     }
+//     const post = await Post.findById(postId);
+//     if (!post) {
+//       res.status(404).json({ message: "Post not found" });
+//       return;
+//     }
+
+//     if (!post.likes.includes(user.id)) {
+//       await Post.findByIdAndUpdate(postId, {
+//         $push: {
+//           likes: user._id,
+//         },
+//       });
+//       await User.findByIdAndUpdate(userId, {
+//         $push: {
+//           yourLikes: post._id,
+//         },
+//       });
+
+//       res.status(201).json({
+//         message: "Like is put successfully",
+//         post,
+//         user,
+//       });
+//       return;
+//     } else {
+//       await Post.findByIdAndUpdate(postId, {
+//         $pull: {
+//           likes: user._id,
+//         },
+//       });
+//       await User.findByIdAndUpdate(userId, {
+//         $pull: {
+//           yourLikes: post._id,
+//         },
+//       });
+//       res
+//         .status(200)
+//         .json({ message: "Like is deleted successfully", post, user });
+//       return;
+//     }
+//   } catch (error) {
+//     res.status(500).json({ message: error });
+//     return;
+//   }
+// };
+
 export const createLike = async (req: CustomRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-    const { postId } = req.params;
+    const postId = req.body;
 
     const user = await User.findById(userId);
     if (!user) {
@@ -295,70 +351,83 @@ export const createLike = async (req: CustomRequest, res: Response) => {
       return;
     }
 
-    if (post.likes.includes(user.id)) {
-      res.status(400).json({ message: "You have already liked a post" });
-      return;
-    }
-
-    await Post.findByIdAndUpdate(postId, {
-      $push: {
-        likes: user._id,
-      },
-    });
-    await User.findByIdAndUpdate(userId, {
-      $push: {
-        yourLikes: post._id,
-      },
-    });
-
-    res.status(201).json({
-      message: "Like is put successfully",
-      post,
-    });
-    return;
-  } catch (error) {
-    res.status(500).json({ message: error });
-    return;
-  }
-};
-
-export const deleteLike = async (req: CustomRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    const { postId } = req.params;
-
-    const user = await User.findById(userId);
-    if (!user) {
-      res.status(404).json({ message: "User not found" });
-      return;
-    }
-    const post = await Post.findById(postId);
-    if (!post) {
-      res.status(404).json({ message: "Post not found" });
-      return;
-    }
     if (!post.likes.includes(user.id)) {
-      res.status(400).json({ message: "You have not liked a post" });
+      await Post.findByIdAndUpdate(postId, {
+        $push: {
+          likes: user._id,
+        },
+      });
+      await User.findByIdAndUpdate(userId, {
+        $push: {
+          yourLikes: post._id,
+        },
+      });
+
+      res.status(201).json({
+        message: "Like is put successfully",
+        post,
+        user,
+      });
+      return;
+    } else {
+      await Post.findByIdAndUpdate(postId, {
+        $pull: {
+          likes: user._id,
+        },
+      });
+      await User.findByIdAndUpdate(userId, {
+        $pull: {
+          yourLikes: post._id,
+        },
+      });
+      res
+        .status(200)
+        .json({ message: "Like is deleted successfully", post, user });
       return;
     }
-
-    await Post.findByIdAndUpdate(postId, {
-      $pull: {
-        likes: user._id,
-      },
-    });
-    await User.findByIdAndUpdate(userId, {
-      $pull: {
-        yourLikes: post._id,
-      },
-    });
-    res.status(200).json({ message: "Like is deleted successfully" });
-    return;
   } catch (error) {
     res.status(500).json({ message: error });
     return;
   }
 };
+
+// export const deleteLike = async (req: CustomRequest, res: Response) => {
+//   try {
+//     const userId = req.user?.id;
+//     const { postId } = req.params;
+
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       res.status(404).json({ message: "User not found" });
+//       return;
+//     }
+//     const post = await Post.findById(postId);
+//     if (!post) {
+//       res.status(404).json({ message: "Post not found" });
+//       return;
+//     }
+//     if (!post.likes.includes(user.id)) {
+//       res.status(400).json({ message: "You have not liked a post" });
+//       return;
+//     }
+
+//     await Post.findByIdAndUpdate(postId, {
+//       $pull: {
+//         likes: user._id,
+//       },
+//     });
+//     await User.findByIdAndUpdate(userId, {
+//       $pull: {
+//         yourLikes: post._id,
+//       },
+//     });
+//     res.status(200).json({ message: "Like is deleted successfully" });
+//     return;
+//   } catch (error) {
+//     res.status(500).json({ message: error });
+//     return;
+//   }
+// };
 
 export const showAllPostLikes = async (req: CustomRequest, res: Response) => {
   try {
