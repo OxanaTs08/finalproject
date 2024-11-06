@@ -54,7 +54,11 @@ const ListofPosts = () => {
           ))}
       </Grid>
       <Stack>
-        <img src={AllSeen} alt="Finished" />
+        <img
+          src={AllSeen}
+          alt="Finished"
+          style={{ width: "82px", height: "82px" }}
+        />
         <Typography>You've seen all the updates</Typography>
         <Typography color="#737373">
           You have viewed all new publications

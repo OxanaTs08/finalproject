@@ -59,17 +59,18 @@ const LogInPage = () => {
     if (!usernameError) {
       const loginData = { username, password };
       dispatch(loginUser(loginData));
+      navigate("/MainPage");
     }
   };
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
-    if (token || savedToken) {
+    if (!token || !savedToken) {
       dispatch(resetState());
-      const timer = setTimeout(() => {
-        navigate("/MainPage");
-      }, 1000);
-      return () => clearTimeout(timer);
+      // const timer = setTimeout(() => {
+      //   navigate("/MainPage");
+      // }, 1000);
+      // return () => clearTimeout(timer);
     }
   }, [token, navigate, dispatch, username]);
 

@@ -153,7 +153,7 @@ export const userByIdBody = createAsyncThunk(
 );
 
 export const createFollowing = createAsyncThunk<IUser, { followingId: string }>(
-  "user/following/:followingId",
+  "user/following/tofollow",
   async ({ followingId }, { getState, rejectWithValue }) => {
     try {
       const token =
@@ -162,8 +162,8 @@ export const createFollowing = createAsyncThunk<IUser, { followingId: string }>(
         return rejectWithValue("Authorization token is missing");
       }
       const response = await axios.put(
-        `${API_URL}/following/${followingId}`,
-        {},
+        `${API_URL}/following/tofollow`,
+        { followingId },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -180,32 +180,32 @@ export const createFollowing = createAsyncThunk<IUser, { followingId: string }>(
   }
 );
 
-export const deleteFollowing = createAsyncThunk<IUser, { followingId: string }>(
-  "user/deletefollowing/:followingId",
-  async ({ followingId }, { getState, rejectWithValue }) => {
-    try {
-      const token =
-        (getState() as RootState).users.token || localStorage.getItem("token");
-      if (!token) {
-        return rejectWithValue("Authorization token is missing");
-      }
-      const response = await axios.put(
-        `${API_URL}/deletefollowing/${followingId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      return response.data.user;
-    } catch (error: any) {
-      return rejectWithValue(
-        error.response?.data?.message || "failed to add follower"
-      );
-    }
-  }
-);
+// export const deleteFollowing = createAsyncThunk<IUser, { followingId: string }>(
+//   "user/deletefollowing/:followingId",
+//   async ({ followingId }, { getState, rejectWithValue }) => {
+//     try {
+//       const token =
+//         (getState() as RootState).users.token || localStorage.getItem("token");
+//       if (!token) {
+//         return rejectWithValue("Authorization token is missing");
+//       }
+//       const response = await axios.put(
+//         `${API_URL}/deletefollowing/${followingId}`,
+//         {},
+//         {
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//           },
+//         }
+//       );
+//       return response.data.user;
+//     } catch (error: any) {
+//       return rejectWithValue(
+//         error.response?.data?.message || "failed to add follower"
+//       );
+//     }
+//   }
+// );
 
 export const allOthers = createAsyncThunk(
   "users/showallexceptcurrentuser",
@@ -368,26 +368,26 @@ export const userSlice = createSlice({
         state.isError = true;
         state.message = action.payload as string;
       })
-      .addCase(deleteFollowing.pending, (state) => {
-        state.isLoading = true;
-        state.isError = false;
-        state.message = null;
-      })
-      .addCase(
-        deleteFollowing.fulfilled,
-        (state, action: PayloadAction<IUser>) => {
-          state.isLoading = false;
-          state.currentUser = action.payload;
-          state.followings = state.followings.filter(
-            (following) => following._id !== action.payload._id
-          );
-        }
-      )
-      .addCase(deleteFollowing.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isError = true;
-        state.message = action.payload as string;
-      })
+      // .addCase(deleteFollowing.pending, (state) => {
+      //   state.isLoading = true;
+      //   state.isError = false;
+      //   state.message = null;
+      // })
+      // .addCase(
+      //   deleteFollowing.fulfilled,
+      //   (state, action: PayloadAction<IUser>) => {
+      //     state.isLoading = false;
+      //     state.currentUser = action.payload;
+      //     state.followings = state.followings.filter(
+      //       (following) => following._id !== action.payload._id
+      //     );
+      //   }
+      // )
+      // .addCase(deleteFollowing.rejected, (state, action) => {
+      //   state.isLoading = false;
+      //   state.isError = true;
+      //   state.message = action.payload as string;
+      // })
       .addCase(fetchOwnFollowers.pending, (state) => {
         state.isLoading = true;
         state.isError = false;

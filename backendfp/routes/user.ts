@@ -8,7 +8,7 @@ import {
   showOwnFollowings,
   showownFollowers,
   deleteFollower,
-  deleteFollowing,
+  // deleteFollowing,
   showYourLikes,
   showAllExceptCurrentUser,
   // logoutController,
@@ -28,10 +28,10 @@ router.get(
 );
 router.get("/:id", authenticateJWT, showUserById);
 router.post("/showone/bybody", authenticateJWT, showUser);
-router.put("/following/:followingId", authenticateJWT, toFollow);
+router.put("/following/tofollow", authenticateJWT, toFollow);
 router.get("/following/ownfollowing", authenticateJWT, showOwnFollowings);
 router.get("/followers/ownfollowers", authenticateJWT, showownFollowers);
-router.put("/deletefollowing/:followingId", authenticateJWT, deleteFollowing);
+// router.put("/deletefollowing/:followingId", authenticateJWT, deleteFollowing);
 router.put("/deletefollower/:followerId", authenticateJWT, deleteFollower);
 router.get("/userlikes/yourlikes", authenticateJWT, showYourLikes);
 // router.get("/logout", authenticateJWT, logoutController);

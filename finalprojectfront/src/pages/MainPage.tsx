@@ -22,6 +22,10 @@ import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
 import MyProfile from "../components/MyProfile";
 import ListofPosts from "../components/ListofPosts";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { resetState } from "../redux/userSlice";
+import { useAppDispatch } from "../hooks/useAppDispatch";
+import CreatePost from "../components/CreatePost";
 
 const drawerWidth = 245;
 
@@ -52,7 +56,7 @@ const menu = [
     icon: NotificationsNoneOutlinedIcon,
   },
   {
-    component: <MyProfile />,
+    component: <CreatePost />,
     name: "Create",
     icon: CreateOutlinedIcon,
   },
@@ -65,7 +69,15 @@ const menu = [
 
 const MainPage = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const [selectedComponent, setSelectedComponent] = useState(menu[0].component);
+
+  const handleLogOut = () => {
+    localStorage.removeItem("token");
+    dispatch(resetState());
+    navigate("/");
+  };
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -92,6 +104,7 @@ const MainPage = () => {
               </ListItemButton>
             </ListItem>
           ))}
+          <MainButton buttonText={"Log Out"} onClick={handleLogOut} />
         </List>
       </Drawer>
       <Box

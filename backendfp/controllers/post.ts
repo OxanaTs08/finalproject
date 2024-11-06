@@ -338,7 +338,8 @@ export const updatePost = async (req: CustomRequest, res: Response) => {
 export const createLike = async (req: CustomRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-    const postId = req.body;
+    const { postId } = req.body;
+    console.log("postid in controller", postId);
 
     const user = await User.findById(userId);
     if (!user) {
@@ -387,6 +388,7 @@ export const createLike = async (req: CustomRequest, res: Response) => {
     }
   } catch (error) {
     res.status(500).json({ message: error });
+    console.error(error);
     return;
   }
 };

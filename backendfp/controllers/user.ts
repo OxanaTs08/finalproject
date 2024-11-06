@@ -190,10 +190,58 @@ export const updateUser = async (req: CustomRequest, res: Response) => {
   }
 };
 
+// export const toFollow = async (req: CustomRequest, res: Response) => {
+//   try {
+//     const userId = req.user?.id;
+//     const { followingId } = req.params;
+
+//     console.log("followingId:", followingId);
+
+//     const following = await User.findById(followingId);
+//     if (!following) {
+//       res.status(404).json({ message: "Following not found" });
+//       return;
+//     }
+//     //а если юзер просто в ленте?
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       res.status(404).json({ message: "User not found" });
+//       return;
+//     }
+
+//     if (user.followings.includes(following.id)) {
+//       res
+//         .status(400)
+//         .json({ message: "Following already exists in your list" });
+//       return;
+//     }
+
+//     await User.findByIdAndUpdate(userId, {
+//       $push: {
+//         followings: following._id,
+//       },
+//     });
+//     await User.findByIdAndUpdate(followingId, {
+//       $push: { followers: user._id },
+//     });
+//     const updatedUser = await User.findById(userId).populate("followings");
+
+//     res.status(201).json({
+//       message: "Following is added successfully",
+//       user: updatedUser,
+//       "your following": following,
+//     });
+//     return;
+//   } catch (error) {
+//     res.status(500).json({ message: error });
+//     return;
+//   }
+// };
+
 export const toFollow = async (req: CustomRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-    const { followingId } = req.params;
+    const { followingId } = req.body;
 
     console.log("followingId:", followingId);
 
@@ -202,7 +250,6 @@ export const toFollow = async (req: CustomRequest, res: Response) => {
       res.status(404).json({ message: "Following not found" });
       return;
     }
-    //а если юзер просто в ленте?
     const user = await User.findById(userId);
     if (!user) {
       res.status(404).json({ message: "User not found" });
@@ -210,28 +257,45 @@ export const toFollow = async (req: CustomRequest, res: Response) => {
     }
 
     if (user.followings.includes(following.id)) {
-      res
-        .status(400)
-        .json({ message: "Following already exists in your list" });
+      // res
+      //   .status(400)
+      //   .json({ message: "Following already exists in your list" });
+      // return;
+
+      await User.findByIdAndUpdate(userId, {
+        $pull: {
+          followings: following._id,
+        },
+      });
+      await User.findByIdAndUpdate(followingId, {
+        $pull: { followers: userId },
+      });
+
+      const updatedUser = await User.findById(userId).populate("followings");
+      res.status(201).json({
+        message: "Following is deleted successfully",
+        user: updatedUser,
+        "Following deleted successfully": following,
+      });
+      return;
+    } else {
+      await User.findByIdAndUpdate(userId, {
+        $push: {
+          followings: following._id,
+        },
+      });
+      await User.findByIdAndUpdate(followingId, {
+        $push: { followers: user._id },
+      });
+      const updatedUser = await User.findById(userId).populate("followings");
+
+      res.status(201).json({
+        message: "Following is added successfully",
+        user: updatedUser,
+        "your following": following,
+      });
       return;
     }
-
-    await User.findByIdAndUpdate(userId, {
-      $push: {
-        followings: following._id,
-      },
-    });
-    await User.findByIdAndUpdate(followingId, {
-      $push: { followers: user._id },
-    });
-    const updatedUser = await User.findById(userId).populate("followings");
-
-    res.status(201).json({
-      message: "Following is added successfully",
-      user: updatedUser,
-      "your following": following,
-    });
-    return;
   } catch (error) {
     res.status(500).json({ message: error });
     return;
@@ -294,39 +358,39 @@ export const showownFollowers = async (req: CustomRequest, res: Response) => {
   }
 };
 
-export const deleteFollowing = async (req: CustomRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    const { followingId } = req.params;
+// export const deleteFollowing = async (req: CustomRequest, res: Response) => {
+//   try {
+//     const userId = req.user?.id;
+//     const { followingId } = req.params;
 
-    const following = await User.findById(followingId);
-    if (!following) {
-      res.status(404).json({ message: "Following not found" });
-      return;
-    }
+//     const following = await User.findById(followingId);
+//     if (!following) {
+//       res.status(404).json({ message: "Following not found" });
+//       return;
+//     }
 
-    await User.findByIdAndUpdate(userId, {
-      $pull: {
-        followings: following._id,
-      },
-    });
-    await User.findByIdAndUpdate(followingId, {
-      $pull: { followers: userId },
-    });
+//     await User.findByIdAndUpdate(userId, {
+//       $pull: {
+//         followings: following._id,
+//       },
+//     });
+//     await User.findByIdAndUpdate(followingId, {
+//       $pull: { followers: userId },
+//     });
 
-    const updatedUser = await User.findById(userId).populate("followings");
-    res.status(201).json({
-      message: "Following is deleted successfully",
-      user: updatedUser,
-      "Following deleted successfully": following,
-    });
+//     const updatedUser = await User.findById(userId).populate("followings");
+//     res.status(201).json({
+//       message: "Following is deleted successfully",
+//       user: updatedUser,
+//       "Following deleted successfully": following,
+//     });
 
-    return;
-  } catch (error) {
-    res.status(500).json({ message: error });
-    return;
-  }
-};
+//     return;
+//   } catch (error) {
+//     res.status(500).json({ message: error });
+//     return;
+//   }
+// };
 
 export const deleteFollower = async (req: CustomRequest, res: Response) => {
   try {

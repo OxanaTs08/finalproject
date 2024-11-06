@@ -21,6 +21,10 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import exampleforPost from "../assets/exampleforpost-3.jpeg";
 import CommentIcon from "@mui/icons-material/ModeCommentOutlined";
 import { formatDistanceToNow } from "date-fns";
+import { useState } from "react";
+import { createLike } from "../redux/likeSlice";
+import { createFollowing } from "../redux/userSlice";
+import MainButton from "./MainButton";
 
 const StyledNavLink = styled(NavLink)(() => ({
   color: "rgba(40, 40, 40, 1)",
@@ -33,12 +37,76 @@ const StyledNavLink = styled(NavLink)(() => ({
 
 const PostCard = ({ post }: { post: IPost }) => {
   const dispatch = useAppDispatch();
+  const [isLiked, setIsLiked] = useState<boolean>(false);
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const [likesCount, setLikesCount] = useState<number>(
+    post.likes !== undefined ? post.likes.length : 0
+  );
+
+  // const likesNumber = useSelector(
+  //   (state: RootState) => state.posts.likes?.length
+  // );
+
+  const currentUserId = useSelector(
+    (state: RootState) => state.users.currentUser?._id
+  );
+  const currentUser = useSelector(
+    (state: RootState) => state.users.currentUser
+  );
 
   const user = post.user;
   const username = user?.username;
+  const userId = user?._id;
 
-  const handleLike = () => {};
+  const postId = post?._id;
+  console.log(postId);
 
+  useEffect(() => {
+    if (post.likes && currentUserId) {
+      setIsLiked(post.likes.includes(currentUserId));
+    }
+  }, [post.likes, currentUserId]);
+
+  useEffect(() => {
+    if (currentUser?.followings && userId) {
+      setIsFollowing(currentUser.followings.includes(userId));
+    }
+  }, [currentUser?.followings, userId]);
+
+  const handleToggleLike = async () => {
+    if (!postId) return;
+    console.log("postId", postId);
+    try {
+      if (isLiked) {
+        await dispatch(createLike({ postId }));
+        setIsLiked((prevLiked) => !prevLiked);
+        setLikesCount((prevCount) => prevCount - 1);
+      } else {
+        await dispatch(createLike({ postId }));
+        setIsLiked((prevLiked) => !prevLiked);
+        setLikesCount((prevCount) => prevCount + 1);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleToggleFollow = async () => {
+    // if (userId) return;
+    try {
+      if (isFollowing) {
+        console.log("followingId in deleting", userId);
+        await dispatch(createFollowing({ followingId: userId }));
+        setIsFollowing(false);
+      } else {
+        console.log("followingId in creating", userId);
+        await dispatch(createFollowing({ followingId: userId }));
+        setIsFollowing(true);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <>
       <Card sx={{ maxWidth: 345 }}>
@@ -51,6 +119,10 @@ const PostCard = ({ post }: { post: IPost }) => {
             })}
           />
         </StyledNavLink>
+        <MainButton
+          buttonText={isFollowing ? "Unfollow" : "Follow"}
+          onClick={handleToggleFollow}
+        />
         <StyledNavLink to={`/posts/${post._id}`}>
           <CardMedia
             component="img"
@@ -60,12 +132,8 @@ const PostCard = ({ post }: { post: IPost }) => {
           />
         </StyledNavLink>
         <CardActions disableSpacing>
-          <IconButton
-            aria-label="like"
-            onClick={handleLike}
-            // color={isLiked ? "error" : "default"}
-          >
-            <FavoriteIcon />
+          <IconButton aria-label="like" onClick={handleToggleLike}>
+            <FavoriteIcon sx={{ color: isLiked ? "red" : "default" }} />
           </IconButton>
           <IconButton aria-label="comment">
             <CommentIcon />
@@ -73,7 +141,7 @@ const PostCard = ({ post }: { post: IPost }) => {
         </CardActions>
 
         <CardContent>
-          <Typography>{post?.likes?.length} Likes</Typography>
+          <Typography>{likesCount} Likes</Typography>
           <StyledNavLink to={`/posts/${post._id}`}>
             <Typography>
               {" "}

@@ -29,7 +29,7 @@ const initialState: LikeState = {
 
 export const createLike = createAsyncThunk<ILike, { postId: String }>(
   "post/like/createlikeinlist",
-  async ({ postId }, { getState, rejectWithValue }) => {
+  async ({ postId: postId }, { getState, rejectWithValue }) => {
     try {
       const token =
         (getState() as RootState).users.token || localStorage.getItem("token");
@@ -53,7 +53,7 @@ export const createLike = createAsyncThunk<ILike, { postId: String }>(
 );
 
 export const likeSlice = createSlice({
-  name: "posts.likes",
+  name: "posts",
   initialState,
   reducers: {
     resetState: () => {
