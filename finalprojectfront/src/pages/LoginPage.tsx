@@ -59,7 +59,7 @@ const LogInPage = () => {
     if (!usernameError) {
       const loginData = { username, password };
       dispatch(loginUser(loginData));
-      navigate("/MainPage");
+      navigate("/posts");
     }
   };
 

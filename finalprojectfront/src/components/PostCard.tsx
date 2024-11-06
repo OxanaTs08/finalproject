@@ -123,7 +123,7 @@ const PostCard = ({ post }: { post: IPost }) => {
           buttonText={isFollowing ? "Unfollow" : "Follow"}
           onClick={handleToggleFollow}
         />
-        <StyledNavLink to={`/posts/${post._id}`}>
+        <StyledNavLink to={`/post/${post._id}`}>
           <CardMedia
             component="img"
             height="194"

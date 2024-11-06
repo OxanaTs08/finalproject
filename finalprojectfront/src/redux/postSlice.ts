@@ -43,22 +43,47 @@ const initialState: PostState = {
   createdAt: "",
 };
 
-export const createPost = createAsyncThunk<IPost, FormData>(
-  "post/create",
-  async (post, { getState, rejectWithValue }) => {
-    try {
-      const token =
-        (getState() as RootState).users.token || localStorage.getItem("token");
-      if (!token) {
-        return rejectWithValue("Authorization token is missing");
-      }
-      const response = await axios.post(`${API_URL}/create`, post);
-      return response.data;
-    } catch (error: any) {
-      return rejectWithValue(error.response.data.message);
+// export const createPost = createAsyncThunk<IPost, FormData>(
+//   "post/create",
+//   async (post, { getState, rejectWithValue }) => {
+//     try {
+//       const token =
+//         (getState() as RootState).users.token || localStorage.getItem("token");
+//       if (!token) {
+//         return rejectWithValue("Authorization token is missing");
+//       }
+//       const response = await axios.post(`${API_URL}/create`, post, {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       });
+//       return response.data;
+//     } catch (error: any) {
+//       return rejectWithValue(error.response.data.message);
+//     }
+//   }
+// );
+
+export const createPost = createAsyncThunk<
+  IPost,
+  { content: string; images: string[] }
+>("post/create", async (post, { getState, rejectWithValue }) => {
+  try {
+    const token =
+      (getState() as RootState).users.token || localStorage.getItem("token");
+    if (!token) {
+      return rejectWithValue("Authorization token is missing");
     }
+    const response = await axios.post(`${API_URL}/create`, post, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    return rejectWithValue(error.response.data.message);
   }
-);
+});
 
 export const showPostById = createAsyncThunk(
   "post/id",
@@ -69,7 +94,11 @@ export const showPostById = createAsyncThunk(
       if (!token) {
         return rejectWithValue("Authorization token is missing");
       }
-      const response = await axios.get(`${API_URL}/${id}`);
+      const response = await axios.get(`${API_URL}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response.data.message);
@@ -108,6 +137,27 @@ export const showPostsByFollowings = createAsyncThunk(
         return rejectWithValue("Authorization token is missing");
       }
       const response = await axios.get(`${API_URL}/all/byourfollowings`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data.posts;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
+export const showAllPosts = createAsyncThunk(
+  "post/showall",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const token =
+        (getState() as RootState).users.token || localStorage.getItem("token");
+      if (!token) {
+        return rejectWithValue("Authorization token is missing");
+      }
+      const response = await axios.get(`${API_URL}/showall`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -177,6 +227,24 @@ export const postSlice = createSlice({
         }
       )
       .addCase(showPostsByFollowings.rejected, (state, action) => {
+        state.isLoading = false;
+        if (state.isError !== null) {
+          state.isError = true;
+          state.message = action.payload as string;
+        }
+      })
+      .addCase(showAllPosts.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(
+        showAllPosts.fulfilled,
+        (state, action: PayloadAction<IPost[] | null>) => {
+          state.isLoading = false;
+          state.posts = action.payload as IPost[];
+        }
+      )
+      .addCase(showAllPosts.rejected, (state, action) => {
         state.isLoading = false;
         if (state.isError !== null) {
           state.isError = true;

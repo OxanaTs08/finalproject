@@ -65,7 +65,7 @@ export const showAllPosts = async (
       res.status(404).json({ message: "User not found" });
       return;
     }
-    const posts = await Post.find();
+    const posts = await Post.find({ user: { $ne: userId } });
     res.status(201).json({ posts });
     return;
   } catch (error: any) {

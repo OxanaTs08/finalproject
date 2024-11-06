@@ -27,51 +27,49 @@ import { resetState } from "../redux/userSlice";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import CreatePost from "../components/CreatePost";
 
-export const drawerWidth = 245;
+export const headerWidth = 245;
 
 const menu = [
   {
-    component: <ListofPosts />,
+    path: "/posts",
     name: "Home",
     icon: HomeOutlinedIcon,
   },
   {
-    component: <MyProfile />,
+    path: "/posts",
     name: "Search",
     icon: SearchOutlinedIcon,
   },
   {
-    component: <MyProfile />,
+    path: "/explore",
     name: "Explore",
     icon: ExploreOutlinedIcon,
   },
   {
-    component: <MyProfile />,
+    path: "/posts",
     name: "Messages",
     icon: MessageOutlinedIcon,
   },
   {
-    component: <MyProfile />,
+    path: "/posts",
     name: "Notifications",
     icon: NotificationsNoneOutlinedIcon,
   },
   {
-    component: <CreatePost />,
+    path: "/createpost",
     name: "Create",
     icon: CreateOutlinedIcon,
   },
   {
-    component: <MyProfile />,
+    path: "/myprofile",
     name: "Profile",
     icon: PersonOutlinedIcon,
   },
 ];
 
-const MainPage = () => {
+const Header = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
-  const [selectedComponent, setSelectedComponent] = useState(menu[0].component);
 
   const handleLogOut = () => {
     localStorage.removeItem("token");
@@ -80,23 +78,23 @@ const MainPage = () => {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          display: { xs: "none", sm: "block" },
-          "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
-        }}
-        open
-      >
+    <AppBar
+      position="fixed"
+      sx={{
+        left: 0,
+        right: "auto",
+        // width: "auto",
+        backgroundColor: "white",
+        color: "black",
+        height: "100%",
+        width: headerWidth,
+      }}
+    >
+      <Toolbar>
         <List>
           {menu.map((menuItem, index) => (
             <ListItem key={index} disablePadding>
-              <ListItemButton
-                onClick={() => setSelectedComponent(menuItem.component)}
-              >
+              <ListItemButton onClick={() => navigate(menuItem.path)}>
                 <ListItemIcon>
                   <menuItem.icon />
                 </ListItemIcon>
@@ -106,20 +104,9 @@ const MainPage = () => {
           ))}
           <MainButton buttonText={"Log Out"} onClick={handleLogOut} />
         </List>
-      </Drawer>
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          width: `calc(100% - ${drawerWidth}px)`,
-          padding: "40px",
-        }}
-      >
-        {selectedComponent}
-      </Box>
-    </Box>
+      </Toolbar>
+    </AppBar>
   );
 };
 
-export default MainPage;
+export default Header;
