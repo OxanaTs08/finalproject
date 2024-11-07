@@ -238,6 +238,30 @@ export const fetchOwnFollowers = createAsyncThunk(
   }
 );
 
+export const searchUsersByName = createAsyncThunk(
+  "users/search/user",
+  async (query: string, { getState, rejectWithValue }) => {
+    try {
+      const token: string | null =
+        (getState() as RootState).users.token || localStorage.getItem("token");
+      if (!token) {
+        return rejectWithValue("Authorization token is missing");
+      }
+      const response = await axios.get(
+        `${API_URL}/search/user?username=${query}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data.users;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
 export const userSlice = createSlice({
   name: "users",
   initialState,
@@ -401,6 +425,23 @@ export const userSlice = createSlice({
         }
       )
       .addCase(fetchOwnFollowers.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      })
+      .addCase(searchUsersByName.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+        state.message = null;
+      })
+      .addCase(
+        searchUsersByName.fulfilled,
+        (state, action: PayloadAction<IUser[]>) => {
+          state.isLoading = false;
+          state.users = action.payload;
+        }
+      )
+      .addCase(searchUsersByName.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload as string;

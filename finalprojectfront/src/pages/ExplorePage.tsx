@@ -24,7 +24,9 @@ const ExplorePage = () => {
     dispatch(showAllPosts());
   }, [dispatch]);
 
-  const postsData = useSelector((state: RootState) => state.posts);
+  const postsData: { posts: IPost[] } = useSelector(
+    (state: RootState) => state.posts
+  );
   const posts = postsData.posts || [];
 
   useEffect(() => {

@@ -444,3 +444,24 @@ export const showYourLikes = async (req: CustomRequest, res: Response) => {
     return;
   }
 };
+
+export const searchUsersByName = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.query;
+
+    if (!username) {
+      res.status(400).json({ error: "Query parameter is required" });
+      return;
+    }
+
+    const users = await User.find({
+      username: { $regex: username, $options: "i" },
+    });
+
+    res.json({ message: "result of search", users });
+    return;
+  } catch (error) {
+    res.status(500).json({ error: "Error white search" });
+    return;
+  }
+};

@@ -4,7 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import Layout from "./pages/Layout";
 // import ListUsers from "./components/ListUsers";
 import RegisterPage from "./pages/RegisterPage";
-// import UserPage from "./components/UserPage";
+import UserPage from "./components/UserPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import MainPage from "./pages/MainPage";
 import ListofPosts from "./components/ListofPosts";
@@ -24,7 +24,7 @@ const AppRouter = () => {
           <Route path="/mainpage" element={<MainPage />} />
           <Route path="/createpost" element={<CreatePost />} />
           <Route path="/post/:id" element={<PostPage />} />
-          {/* <Route path="/users/:id" element={<UserPage />} /> */}
+          <Route path="/profile/:id" element={<UserPage />} />
           <Route path="/forgotpassword" element={<ResetPasswordPage />} />
           <Route path="/myprofile" element={<MyProfile />} />
           <Route path="/explore" element={<ExplorePage />} />

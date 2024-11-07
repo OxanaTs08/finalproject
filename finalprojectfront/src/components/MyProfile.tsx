@@ -4,10 +4,21 @@ import { RootState } from "../redux/store";
 import { IUser, userById } from "../redux/userSlice";
 import { IPost, postsByUser } from "../redux/postSlice";
 import { useEffect } from "react";
-import { Box, Typography, Stack, Grid } from "@mui/material";
+import { Box, Typography, Stack, Grid, CardMedia, styled } from "@mui/material";
 import MainButton from "./MainButton";
 import { useNavigate } from "react-router-dom";
 import PostCard from "./PostCard";
+import exampleforPost from "../assets/exampleforpost-3.jpeg";
+import { NavLink } from "react-router-dom";
+
+const StyledNavLink = styled(NavLink)(() => ({
+  color: "rgba(40, 40, 40, 1)",
+  textDecoration: "none",
+  "&:hover": {
+    cursor: "pointer",
+    color: "rgba(40, 40, 40, 0.5)",
+  },
+}));
 
 const MyProfile = () => {
   const navigate = useNavigate();
@@ -68,7 +79,14 @@ const MyProfile = () => {
           {posts.length > 0 ? (
             posts.map((post: IPost) => (
               <Grid item xs={12} sm={6} md={3} key={post._id}>
-                <PostCard post={post} />
+                <StyledNavLink to={`/post/:${post._id}`}>
+                  <CardMedia
+                    component="img"
+                    height="194"
+                    image={exampleforPost}
+                    alt="post"
+                  />
+                </StyledNavLink>
               </Grid>
             ))
           ) : (

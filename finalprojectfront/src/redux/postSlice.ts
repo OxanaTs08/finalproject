@@ -168,6 +168,26 @@ export const showAllPosts = createAsyncThunk(
     }
   }
 );
+export const postsByAnotherUser = createAsyncThunk(
+  "post/user/:id",
+  async (id: string, { getState, rejectWithValue }) => {
+    try {
+      const token =
+        (getState() as RootState).users.token || localStorage.getItem("token");
+      if (!token) {
+        return rejectWithValue("Authorization token is missing");
+      }
+      const response = await axios.get(`${API_URL}/user/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data.posts;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data.message);
+    }
+  }
+);
 
 export const postSlice = createSlice({
   name: "posts",
@@ -245,6 +265,24 @@ export const postSlice = createSlice({
         }
       )
       .addCase(showAllPosts.rejected, (state, action) => {
+        state.isLoading = false;
+        if (state.isError !== null) {
+          state.isError = true;
+          state.message = action.payload as string;
+        }
+      })
+      .addCase(postsByAnotherUser.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(
+        postsByAnotherUser.fulfilled,
+        (state, action: PayloadAction<IPost[] | null>) => {
+          state.isLoading = false;
+          state.posts = action.payload as IPost[];
+        }
+      )
+      .addCase(postsByAnotherUser.rejected, (state, action) => {
         state.isLoading = false;
         if (state.isError !== null) {
           state.isError = true;

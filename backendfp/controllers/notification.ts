@@ -18,7 +18,7 @@ interface CustomRequest extends Request {
 export const createNotification = async (req: CustomRequest, res: Response) => {
   try {
     const { userId, postId, type } = req.body;
-    if (!postId || !type) {
+    if (!userId || !type) {
       res.status(400).json({ message: "missing data" });
       return;
     }
@@ -40,13 +40,18 @@ export const createNotification = async (req: CustomRequest, res: Response) => {
       return;
     }
 
-    const newNotification = await Notification.create({
+    const notificationData: Partial<INotification> = {
       userId,
       senderId: currentUserId,
       type,
-      postId,
       isRead: false,
-    });
+    };
+
+    if (postId) {
+      notificationData.postId = postId;
+    }
+
+    const newNotification = await Notification.create(notificationData);
 
     res.status(201).json({
       message: "Notification is created successfully",
@@ -55,6 +60,29 @@ export const createNotification = async (req: CustomRequest, res: Response) => {
     return;
   } catch (error: any) {
     res.status(500).json({ message: "Error while creating notification" });
+    return;
+  }
+};
+
+export const showNotifications = async (req: CustomRequest, res: Response) => {
+  try {
+    const currentUserId = req.user?.id;
+    if (!currentUserId) {
+      res.status(401).json({ message: "Unauthorized in auth" });
+      return;
+    }
+
+    const user = await User.findById(currentUserId);
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+    const notifications = await Notification.find({ userId: currentUserId })
+      .populate("senderId", "username")
+      .populate("postId", "images");
+    res.status(200).json({ notifications });
+  } catch (error: any) {
+    res.status(500).json({ message: "Error while fetching notifications" });
     return;
   }
 };
