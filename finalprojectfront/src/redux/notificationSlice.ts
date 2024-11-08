@@ -6,10 +6,17 @@ import { IPost } from "./postSlice";
 
 export interface INotification {
   _id: string;
-  userId: string;
-  senderId: string;
+  user: IUser;
+  sender: {
+    _id: string;
+    username: string;
+    avatarUrl?: string;
+  };
   type: string;
-  postId?: string;
+  post?: {
+    _id: string;
+    images: string[];
+  };
   isRead: boolean;
   createdAt: string;
 }
@@ -32,11 +39,11 @@ const initialState: NotificationState = {
 
 export const createNotification = createAsyncThunk<
   INotification,
-  { postId?: String; userId: string; type: string },
+  { post?: IPost; user: IUser; type: string },
   { state: RootState }
 >(
   "notification/create",
-  async ({ postId, userId, type }, { getState, rejectWithValue }) => {
+  async ({ post, user, type }, { getState, rejectWithValue }) => {
     try {
       const token =
         (getState() as RootState).users.token || localStorage.getItem("token");
@@ -45,7 +52,7 @@ export const createNotification = createAsyncThunk<
       }
       const response = await axios.post(
         `${API_URL}/create`,
-        { postId, userId, type },
+        { post, user, type },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -73,7 +80,7 @@ export const showNotifications = createAsyncThunk<INotification[]>(
           Authorization: `Bearer ${token}`,
         },
       });
-      return response.data.posts;
+      return response.data.notifications;
     } catch (error: any) {
       return rejectWithValue(error.response.data.message);
     }

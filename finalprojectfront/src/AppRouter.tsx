@@ -1,8 +1,6 @@
-import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
-// import HomePage from "./pages/HomePage";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import Layout from "./pages/Layout";
-// import ListUsers from "./components/ListUsers";
 import RegisterPage from "./pages/RegisterPage";
 import UserPage from "./components/UserPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -22,7 +20,7 @@ const AppRouter = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/" element={<LoginPage />} />
           <Route path="/mainpage" element={<MainPage />} />
-          <Route path="/createpost" element={<CreatePost />} />
+          <Route path="/create" element={<CreatePost />} />
           <Route path="/post/:id" element={<PostPage />} />
           <Route path="/profile/:id" element={<UserPage />} />
           <Route path="/forgotpassword" element={<ResetPasswordPage />} />

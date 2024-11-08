@@ -1,4 +1,4 @@
-import { Document, Schema, model } from "mongoose";
+import mongoose, { Document, Schema, model } from "mongoose";
 
 export enum NotificationType {
   Like = "like",
@@ -8,19 +8,31 @@ export enum NotificationType {
 }
 
 export interface INotification extends Document {
-  userId: string;
-  senderId: string;
+  user: mongoose.Types.ObjectId;
+  sender: mongoose.Types.ObjectId;
   type: NotificationType;
-  postId?: string;
+  post?: mongoose.Types.ObjectId;
   isRead: boolean;
   createdAt: Date;
 }
 
 const NotificationSchema = new Schema<INotification>({
-  userId: { type: String, required: true, ref: "User" },
-  senderId: { type: String, required: true, ref: "User" },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  sender: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
   type: { type: String, required: true, enum: Object.values(NotificationType) },
-  postId: { type: String, ref: "Post" },
+  post: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Post",
+    required: true,
+  },
   isRead: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });

@@ -1,4 +1,4 @@
-import { Box, Grid, Stack, Typography } from "@mui/material";
+import { Box, Grid } from "@mui/material";
 import { IPost, showAllPosts } from "../redux/postSlice";
 import { IUser, userById } from "../redux/userSlice";
 import { useEffect } from "react";
@@ -7,7 +7,7 @@ import { useAppDispatch } from "../hooks/useAppDispatch";
 import PostCard from "../components/PostCard";
 import { Root } from "react-dom/client";
 import { RootState } from "../redux/store";
-import AllSeen from "../assets/allseen.png.svg";
+import InfoUpdates from "../components/InfoUpdates";
 
 const ExplorePage = () => {
   const dispatch = useAppDispatch();
@@ -55,17 +55,7 @@ const ExplorePage = () => {
             </Grid>
           ))}
       </Grid>
-      <Stack>
-        <img
-          src={AllSeen}
-          alt="Finished"
-          style={{ width: "82px", height: "82px" }}
-        />
-        <Typography>You've seen all the updates</Typography>
-        <Typography color="#737373">
-          You have viewed all new publications
-        </Typography>
-      </Stack>
+      <InfoUpdates />
     </Box>
   );
 };

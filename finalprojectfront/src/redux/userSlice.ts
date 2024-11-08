@@ -262,6 +262,27 @@ export const searchUsersByName = createAsyncThunk(
   }
 );
 
+export const updatedUser = createAsyncThunk(
+  "users/edit",
+  async (user: IUser, { getState, rejectWithValue }) => {
+    try {
+      const token: string | null =
+        (getState() as RootState).users.token || localStorage.getItem("token");
+      if (!token) {
+        return rejectWithValue("Authorization token is missing");
+      }
+      const response = await axios.put(`${API_URL}/edit`, user, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
 export const userSlice = createSlice({
   name: "users",
   initialState,
@@ -442,6 +463,20 @@ export const userSlice = createSlice({
         }
       )
       .addCase(searchUsersByName.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      })
+      .addCase(updatedUser.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+        state.message = null;
+      })
+      .addCase(updatedUser.fulfilled, (state, action: PayloadAction<IUser>) => {
+        state.isLoading = false;
+        state.user = action.payload;
+      })
+      .addCase(updatedUser.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload as string;

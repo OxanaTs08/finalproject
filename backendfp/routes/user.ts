@@ -14,6 +14,7 @@ import {
   // logoutController,
   searchUsersByName,
   showUser,
+  updateUser,
 } from "../controllers/user";
 import authenticateJWT from "../middleWares/authMiddleWare";
 
@@ -27,6 +28,7 @@ router.get(
   authenticateJWT,
   showAllExceptCurrentUser
 );
+router.put("/edit", authenticateJWT, updateUser);
 router.get("/:id", authenticateJWT, showUserById);
 router.post("/showone/bybody", authenticateJWT, showUser);
 router.put("/following/tofollow", authenticateJWT, toFollow);

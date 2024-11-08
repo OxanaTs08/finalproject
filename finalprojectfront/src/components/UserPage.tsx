@@ -7,9 +7,7 @@ import { useEffect, useState } from "react";
 import { Box, Typography, Stack, Grid, CardMedia, styled } from "@mui/material";
 import MainButton from "./MainButton";
 import { useNavigate } from "react-router-dom";
-import PostCard from "./PostCard";
 import { useParams } from "react-router-dom";
-import exampleforPost from "../assets/exampleforpost-3.jpeg";
 import { NavLink } from "react-router-dom";
 
 const StyledNavLink = styled(NavLink)(() => ({
@@ -27,9 +25,6 @@ const UserPage = () => {
   const dispatch = useAppDispatch();
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
-  const currentUserId = useSelector(
-    (state: RootState) => state.users.currentUser?._id
-  );
   const currentUser = useSelector(
     (state: RootState) => state.users.currentUser
   );
@@ -116,13 +111,10 @@ const UserPage = () => {
                   <CardMedia
                     component="img"
                     height="194"
-                    image={exampleforPost}
+                    image={post.images.join(", ")}
                     alt="post"
                   />
                 </StyledNavLink>
-                {/* <img 
-                src={post.images} 
-                /> */}
               </Grid>
             ))
           ) : (

@@ -2,22 +2,61 @@ import { User, IUser } from "../models/userModel";
 import { Post, IPost } from "../models/postModel";
 import dotenv from "dotenv";
 import { RequestHandler, Request, Response } from "express";
+import cloudinary from "../config/cloudinary";
 dotenv.config({ path: ".env" });
 
 interface CustomRequest extends Request {
   user?: IUser;
 }
 
+// export const createPost = async (req: CustomRequest, res: Response) => {
+//   try {
+//     const { content, images } = req.body;
+//     if (!content || !images) {
+//       res.status(400).json({ message: "content and images are required" });
+//       return;
+//     }
+
+//     const userId = req.user?.id;
+
+//     if (!userId) {
+//       res.status(401).json({ message: "Unauthorized in auth" });
+//       return;
+//     }
+
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       res.status(404).json({ message: "User not found" });
+//       return;
+//     }
+
+//     const newPost = await Post.create({
+//       content,
+//       images,
+//       user: userId,
+//     });
+//     await User.findByIdAndUpdate(userId, {
+//       $push: {
+//         posts: newPost._id,
+//       },
+//     });
+//     res.status(201).json({ message: "Post is created successfully", newPost });
+//     return;
+//   } catch (error: any) {
+//     res.status(500).json({ message: "Error while creating post" });
+//     return;
+//   }
+// };
+
 export const createPost = async (req: CustomRequest, res: Response) => {
   try {
     const { content, images } = req.body;
-    if (!content || !images) {
+    if (!content || !images || !Array.isArray(images) || images.length === 0) {
       res.status(400).json({ message: "content and images are required" });
       return;
     }
 
     const userId = req.user?.id;
-
     if (!userId) {
       res.status(401).json({ message: "Unauthorized in auth" });
       return;
@@ -29,9 +68,18 @@ export const createPost = async (req: CustomRequest, res: Response) => {
       return;
     }
 
+    const uploadedImageUrls: string[] = [];
+    for (const base64Image of images) {
+      const result = await cloudinary.uploader.upload(base64Image, {
+        folder: "posts",
+        resourse_type: "image",
+      });
+      uploadedImageUrls.push(result.url);
+    }
+
     const newPost = await Post.create({
       content,
-      images,
+      images: uploadedImageUrls,
       user: userId,
     });
     await User.findByIdAndUpdate(userId, {
@@ -47,7 +95,6 @@ export const createPost = async (req: CustomRequest, res: Response) => {
   }
 };
 
-//доделать кроме своих
 export const showAllPosts = async (
   req: CustomRequest,
   res: Response

@@ -83,7 +83,7 @@ const MyProfile = () => {
                   <CardMedia
                     component="img"
                     height="194"
-                    image={exampleforPost}
+                    image={post.images.join(", ")}
                     alt="post"
                   />
                 </StyledNavLink>

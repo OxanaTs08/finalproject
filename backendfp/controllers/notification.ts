@@ -1,14 +1,12 @@
 import { User, IUser } from "../models/userModel";
-import { Post, IPost } from "../models/postModel";
 import {
   Notification,
   INotification,
   NotificationType,
 } from "../models/notificationsModel";
 import dotenv from "dotenv";
-import { RequestHandler, Request, Response } from "express";
-import { Types } from "mongoose";
-import { ObjectId } from "mongodb";
+import { Request, Response } from "express";
+import mongoose from "mongoose";
 dotenv.config({ path: ".env" });
 
 interface CustomRequest extends Request {
@@ -17,8 +15,8 @@ interface CustomRequest extends Request {
 
 export const createNotification = async (req: CustomRequest, res: Response) => {
   try {
-    const { userId, postId, type } = req.body;
-    if (!userId || !type) {
+    const { user, post, type } = req.body;
+    if (!user || !type) {
       res.status(400).json({ message: "missing data" });
       return;
     }
@@ -34,21 +32,23 @@ export const createNotification = async (req: CustomRequest, res: Response) => {
       return;
     }
 
-    const user = await User.findById(currentUserId);
-    if (!user) {
-      res.status(404).json({ message: "User not found" });
+    const sender: IUser | null = (await User.findById(
+      currentUserId
+    ).lean()) as IUser | null;
+    if (!sender) {
+      res.status(404).json({ message: "sender not found" });
       return;
     }
 
     const notificationData: Partial<INotification> = {
-      userId,
-      senderId: currentUserId,
+      user,
+      sender: sender._id as mongoose.Types.ObjectId,
       type,
       isRead: false,
     };
 
-    if (postId) {
-      notificationData.postId = postId;
+    if (post) {
+      notificationData.post = post;
     }
 
     const newNotification = await Notification.create(notificationData);
@@ -77,9 +77,9 @@ export const showNotifications = async (req: CustomRequest, res: Response) => {
       res.status(404).json({ message: "User not found" });
       return;
     }
-    const notifications = await Notification.find({ userId: currentUserId })
-      .populate("senderId", "username")
-      .populate("postId", "images");
+    const notifications = await Notification.find({ user: currentUserId })
+      .populate({ path: "sender", select: "username avatarUrl" })
+      .populate({ path: "post", select: "images" });
     res.status(200).json({ notifications });
   } catch (error: any) {
     res.status(500).json({ message: "Error while fetching notifications" });

@@ -174,9 +174,9 @@ export const showUser: RequestHandler = async (req, res) => {
 export const updateUser = async (req: CustomRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-    const { username, avatarUrl, email } = req.body;
+    const { username, avatarUrl, email, description } = req.body;
 
-    if (!username && !avatarUrl && !email) {
+    if (!username && !avatarUrl && !email && !description) {
       res.status(400).json({ message: "At least one field is required" });
       return;
     }

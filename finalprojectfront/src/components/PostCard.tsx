@@ -1,5 +1,4 @@
 import {
-  Box,
   Typography,
   styled,
   Card,
@@ -9,22 +8,21 @@ import {
   CardMedia,
   CardContent,
   CardActions,
-  Button,
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { RootState } from "../redux/store";
 import { IPost } from "../redux/postSlice";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import exampleforPost from "../assets/exampleforpost-3.jpeg";
 import CommentIcon from "@mui/icons-material/ModeCommentOutlined";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import { createLike } from "../redux/likeSlice";
 import { createFollowing } from "../redux/userSlice";
 import MainButton from "./MainButton";
+import { createNotification } from "../redux/notificationSlice";
 
 const StyledNavLink = styled(NavLink)(() => ({
   color: "rgba(40, 40, 40, 1)",
@@ -42,10 +40,6 @@ const PostCard = ({ post }: { post: IPost }) => {
   const [likesCount, setLikesCount] = useState<number>(
     post.likes !== undefined ? post.likes.length : 0
   );
-
-  // const likesNumber = useSelector(
-  //   (state: RootState) => state.posts.likes?.length
-  // );
 
   const currentUserId = useSelector(
     (state: RootState) => state.users.currentUser?._id
@@ -85,6 +79,13 @@ const PostCard = ({ post }: { post: IPost }) => {
         await dispatch(createLike({ postId }));
         setIsLiked((prevLiked) => !prevLiked);
         setLikesCount((prevCount) => prevCount + 1);
+        await dispatch(
+          createNotification({
+            post: post,
+            user: post.user,
+            type: "like",
+          })
+        );
       }
     } catch (error) {
       console.error(error);
@@ -92,7 +93,6 @@ const PostCard = ({ post }: { post: IPost }) => {
   };
 
   const handleToggleFollow = async () => {
-    // if (userId) return;
     try {
       if (isFollowing) {
         console.log("followingId in deleting", userId);
@@ -110,7 +110,7 @@ const PostCard = ({ post }: { post: IPost }) => {
   return (
     <>
       <Card sx={{ maxWidth: 345 }}>
-        <StyledNavLink to={`/users/${user._id}`}>
+        <StyledNavLink to={`/profile/${user._id}`}>
           <CardHeader
             avatar={<Avatar aria-label="recipe">U</Avatar>}
             title={username}
@@ -127,7 +127,7 @@ const PostCard = ({ post }: { post: IPost }) => {
           <CardMedia
             component="img"
             height="194"
-            image={exampleforPost}
+            image={post.images.join(", ")}
             alt="post"
           />
         </StyledNavLink>
@@ -142,12 +142,25 @@ const PostCard = ({ post }: { post: IPost }) => {
 
         <CardContent>
           <Typography>{likesCount} Likes</Typography>
+
+          <Typography>
+            {" "}
+            Show All Comments ({post?.comments?.length}){" "}
+          </Typography>
           <StyledNavLink to={`/posts/${post._id}`}>
-            <Typography>
-              {" "}
-              Show All Comments ({post?.comments?.length}){" "}
+            <Typography
+              variant="body2"
+              sx={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                display: "-webkit-box",
+                WebkitLineClamp: 1,
+                WebkitBoxOrient: "vertical",
+              }}
+            >
+              {post.content}
             </Typography>
-            <Typography variant="body2">{post.content}</Typography>
           </StyledNavLink>
         </CardContent>
       </Card>

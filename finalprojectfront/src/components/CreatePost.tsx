@@ -1,5 +1,4 @@
 import {
-  Backdrop,
   Button,
   Dialog,
   DialogActions,
@@ -9,14 +8,14 @@ import {
   styled,
 } from "@mui/material";
 import { createPost } from "../redux/postSlice";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { RootState } from "../redux/store";
 import { useState } from "react";
 import MainButton from "./MainButton";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useNavigate } from "react-router-dom";
+import { convertMultipleFilesToBase64 } from "../utils/imageUtils";
 
 const StyledTextField = styled(TextField)(() => ({
   border: "1px solid #DBDBDB",
@@ -31,13 +30,10 @@ const CreatePost = () => {
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(true);
-  const [images, setImages] = useState<string>("");
+  const [images, setImages] = useState<string[]>([]);
   const [content, setContent] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const currentUserId = useSelector(
-    (state: RootState) => state.users.currentUser?._id
-  );
   const currentUser = useSelector(
     (state: RootState) => state.users.currentUser
   );
@@ -45,20 +41,13 @@ const CreatePost = () => {
 
   const handleCreatePost = async () => {
     console.log("Creating post with:", { images, content });
-    if (!content || !images) {
+    if (!content || images.length === 0) {
       setErrorMessage("Both content and images are required.");
       console.error("Content and images are required");
       return;
     }
     try {
-      // const formData = new FormData();
-      // formData.append("content", content);
-      // formData.append("images", images);
-
-      // for (let [key, value] of formData.entries()) {
-      //   console.log(`${key}: ${value}`);
-      // }
-      const postData = { content, images: [images] };
+      const postData = { content, images };
       console.log("postData", postData);
 
       const result = await dispatch(createPost(postData));
@@ -76,7 +65,15 @@ const CreatePost = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     handleCreatePost();
-    navigate("/MainPage");
+    navigate("/myprofile");
+  };
+
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      const base64Images = await convertMultipleFilesToBase64(files);
+      setImages(base64Images);
+    }
   };
 
   // const handleClickOpen = () => {
@@ -89,17 +86,6 @@ const CreatePost = () => {
 
   return (
     <>
-      {/* <Backdrop
-        open={open}
-        onClick={handleClose}
-        style={{
-          backgroundColor: "rgba(0, 0, 0, 0.3)",
-          zIndex: 1000,
-          position: "absolute",
-          left: drawerWidth,
-          width: `calc(100% - ${drawerWidth}px)`,
-        }}
-      /> */}
       <Dialog
         open={open}
         onClose={handleClose}
@@ -108,26 +94,12 @@ const CreatePost = () => {
       >
         <DialogTitle id="alert-dialog-title">{"Create your Post"}</DialogTitle>
         <DialogContent>
-          {/* <DialogContentText id="alert-dialog-description">
-            Let Google help apps determine location. This means sending
-            anonymous location data to Google, even when no apps are running.
-          </DialogContentText> */}
           <form onSubmit={handleSubmit}>
-            {/* <input
+            <input
               type="file"
-              hidden
-              //  onChange={}
-            /> */}
-            <StyledTextField
-              type="text"
-              label="images"
-              placeholder="images"
-              multiline
-              rows={4}
-              variant="outlined"
-              fullWidth
-              value={images}
-              onChange={(e) => setImages(e.target.value)}
+              accept="image/*"
+              multiple
+              onChange={handleImageChange}
             />
             <StyledTextField
               type="text"

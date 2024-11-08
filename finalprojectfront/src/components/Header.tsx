@@ -9,9 +9,6 @@ import {
   ListItemIcon,
   ListItemText,
   Drawer,
-  styled,
-  TextField,
-  Avatar,
 } from "@mui/material";
 import MainButton from "../components/MainButton";
 import { useNavigate } from "react-router-dom";
@@ -22,14 +19,11 @@ import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNone
 import MessageOutlinedIcon from "@mui/icons-material/MessageOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import CreateOutlinedIcon from "@mui/icons-material/CreateOutlined";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useState } from "react";
 import { resetState } from "../redux/userSlice";
 import { useAppDispatch } from "../hooks/useAppDispatch";
-import { IUser, searchUsersByName } from "../redux/userSlice";
-import { Root } from "react-dom/client";
-import { RootState } from "../redux/store";
-import { useSelector } from "react-redux";
+import Notifications from "../components/Notifications";
+import Search from "./ Search";
 
 export const headerWidth = 245;
 
@@ -60,7 +54,7 @@ const menu = [
     icon: NotificationsNoneOutlinedIcon,
   },
   {
-    path: "/createpost",
+    path: "/create",
     name: "Create",
     icon: CreateOutlinedIcon,
   },
@@ -71,17 +65,9 @@ const menu = [
   },
 ];
 
-const StyledTextField = styled(TextField)(() => ({
-  border: "1px solid #DBDBDB",
-  borderRadius: "8px",
-  color: " #737373",
-  backgroundColor: "#FAFAFA",
-}));
-
 const Header = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [query, setQuery] = useState("");
 
   const handleLogOut = () => {
     localStorage.removeItem("token");
@@ -100,16 +86,6 @@ const Header = () => {
       setIsDrawerOpen(open);
       setDrawerContent(content);
     };
-  const users = useSelector((state: RootState) => state.users.users);
-  const isLoading = useSelector((state: RootState) => state.users.isLoading);
-  const isError = useSelector((state: RootState) => state.users.isError);
-
-  useEffect(() => {
-    if (query) {
-      console.log("query", query);
-      dispatch(searchUsersByName(query));
-    }
-  }, [dispatch, query]);
 
   return (
     <>
@@ -135,7 +111,7 @@ const Header = () => {
                       ? toggleDrawer(true, "search")()
                       : menuItem.name === "Notifications"
                       ? toggleDrawer(true, "notifications")()
-                      : menuItem.name === "Notifications"
+                      : navigate(menuItem.path)
                   }
                 >
                   <ListItemIcon>
@@ -166,42 +142,20 @@ const Header = () => {
           },
         }}
       >
-        <Box sx={{ padding: "20px" }}>
+        <>
           {drawerContent === "search" && (
-            <>
-              <StyledTextField
-                fullWidth
-                margin="normal"
-                type="text"
-                label="Search users"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                // onChange={handleNameChange}
-              />
-              {isLoading && <Typography>Loading...</Typography>}
-              {isError && <Typography color="error">{isError}</Typography>}
-              {users.length > 0 && (
-                <List>
-                  {users.map((user) => (
-                    <ListItem key={user._id}>
-                      <Avatar
-                        onClick={() => navigate(`/profile/${user._id}`)}
-                        sx={{ cursor: "pointer" }}
-                        src={user.avatarUrl}
-                      />
-                      <ListItemText primary={user.username} />
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-            </>
+            <Box sx={{ padding: "20px" }}>
+              <Search />
+            </Box>
           )}
-        </Box>
-        {drawerContent === "notifications" && (
-          <Box sx={{ padding: "20px" }}>
-            <Typography>Notifications</Typography>
-          </Box>
-        )}
+
+          {drawerContent === "notifications" && (
+            <Box sx={{ padding: "20px" }}>
+              <Typography>Notifications</Typography>
+              <Notifications />
+            </Box>
+          )}
+        </>
       </Drawer>
     </>
   );
