@@ -47,7 +47,16 @@ const ExplorePage = () => {
         paddingTop: "40px",
       }}
     >
-      <Grid container spacing={2} justifyContent="center">
+      <Grid
+        container
+        spacing={0}
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(5, 1fr)",
+          gridTemplateRows: "repeat(5, 1fr)",
+        }}
+        justifyContent="center"
+      >
         {posts &&
           posts.map((post: IPost) => (
             <Grid item xs={12} sm={6} md={3} key={post._id}>

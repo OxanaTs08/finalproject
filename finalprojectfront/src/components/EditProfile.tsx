@@ -30,7 +30,7 @@ const EditProfile = () => {
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(true);
-  const [avatarUrl, setAvatarUrl] = useState<string[]>([]);
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [username, setUsername] = useState<string>("");
 
@@ -79,7 +79,7 @@ const EditProfile = () => {
   };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.file;
+    const file = e.target.files?.[0];
     if (file) {
       const base64Image = await convertToBase64(file);
       setAvatarUrl(base64Image);

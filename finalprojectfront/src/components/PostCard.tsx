@@ -23,6 +23,7 @@ import { createLike } from "../redux/likeSlice";
 import { createFollowing } from "../redux/userSlice";
 import MainButton from "./MainButton";
 import { createNotification } from "../redux/notificationSlice";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 
 const StyledNavLink = styled(NavLink)(() => ({
   color: "rgba(40, 40, 40, 1)",
@@ -49,11 +50,13 @@ const PostCard = ({ post }: { post: IPost }) => {
   );
 
   const user = post.user;
+  console.log("user who wrote the post", user);
   const username = user?.username;
   const userId = user?._id;
+  const profilePicture = user?.avatarUrl;
 
   const postId = post?._id;
-  console.log(postId);
+  // console.log(postId);
 
   useEffect(() => {
     if (post.likes && currentUserId) {
@@ -69,7 +72,7 @@ const PostCard = ({ post }: { post: IPost }) => {
 
   const handleToggleLike = async () => {
     if (!postId) return;
-    console.log("postId", postId);
+    // console.log("postId", postId);
     try {
       if (isLiked) {
         await dispatch(createLike({ postId }));
@@ -95,13 +98,13 @@ const PostCard = ({ post }: { post: IPost }) => {
   const handleToggleFollow = async () => {
     try {
       if (isFollowing) {
-        console.log("followingId in deleting", userId);
+        // console.log("followingId in deleting", userId);
         await dispatch(createFollowing({ followingId: userId }));
-        setIsFollowing(false);
+        setIsFollowing((prev) => !prev);
       } else {
-        console.log("followingId in creating", userId);
+        // console.log("followingId in creating", userId);
         await dispatch(createFollowing({ followingId: userId }));
-        setIsFollowing(true);
+        setIsFollowing((prev) => !prev);
       }
     } catch (error) {
       console.error(error);
@@ -112,7 +115,11 @@ const PostCard = ({ post }: { post: IPost }) => {
       <Card sx={{ maxWidth: 345 }}>
         <StyledNavLink to={`/profile/${user._id}`}>
           <CardHeader
-            avatar={<Avatar aria-label="recipe">U</Avatar>}
+            avatar={
+              <Avatar aria-label="recipe" src={profilePicture}>
+                {!profilePicture && <PersonOutlineOutlinedIcon />}
+              </Avatar>
+            }
             title={username}
             subheader={formatDistanceToNow(new Date(post.createdAt), {
               addSuffix: true,

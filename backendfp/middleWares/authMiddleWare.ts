@@ -33,7 +33,7 @@ const authenticateJWT: RequestHandler = (
         if (err) {
           return res.status(403).json({ message: "Invalid or expired token" });
         }
-        console.log("Decoded token:", decodedToken);
+        // console.log("Decoded token:", decodedToken);
         if (
           !decodedToken ||
           typeof decodedToken !== "object" ||
@@ -44,7 +44,7 @@ const authenticateJWT: RequestHandler = (
             .json({ message: "Token does not contain user id" });
         }
         req.user = decodedToken as JwtPayload;
-        console.log("User ID in req.user in middleware:", req.user.id);
+        // console.log("User ID in req.user in middleware:", req.user.id);
         next();
       });
     } else {

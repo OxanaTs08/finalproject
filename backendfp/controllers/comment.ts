@@ -11,8 +11,7 @@ interface CustomRequest extends Request {
 
 export const createComment = async (req: CustomRequest, res: Response) => {
   try {
-    const { id } = req.params;
-    const { text } = req.body;
+    const { id, text } = req.body;
     if (!text) {
       res.status(400).json({ message: "text is required" });
       return;
@@ -62,7 +61,7 @@ export const showAllComments = async (
 ): Promise<void> => {
   try {
     const userId = req.user?.id;
-    const { id } = req.params;
+    const { id } = req.body;
 
     if (!userId) {
       res.status(401).json({ message: "Unauthorized in auth" });
@@ -91,7 +90,7 @@ export const showAllComments = async (
 
 export const deleteComment = async (req: CustomRequest, res: Response) => {
   try {
-    const { postId, id } = req.params;
+    const { postId, id } = req.body;
     if (!id) {
       res.status(400).json({ message: "Id is required" });
       return;

@@ -7,6 +7,10 @@ import userRouter from "./routes/user";
 import postRouter from "./routes/post";
 import commentRouter from "./routes/comment";
 import notificationRouter from "./routes/notifications";
+import authenticateJWT from "./middleWares/authMiddleWare";
+import { User } from "./models/userModel";
+import { Request, Response, NextFunction, RequestHandler } from "express";
+
 dotenv.config({ path: ".env" });
 const port = process.env.PORT || 4001;
 
@@ -17,6 +21,36 @@ app.use("/user", userRouter);
 app.use("/post", postRouter);
 app.use("/comment", commentRouter);
 app.use("/notification", notificationRouter);
+
+interface JwtPayload {
+  id: string;
+  username: string;
+}
+
+interface CustomRequest extends Request {
+  user?: JwtPayload;
+}
+
+app.get(
+  "/api/verify-token",
+  authenticateJWT,
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?.id;
+      const user = await User.findById(userId).select("-password"); // исключаем пароль
+      if (!user) {
+        res.status(404).json({ message: "Пользователь не найден" });
+        return;
+      }
+      res.json(user);
+      return;
+    } catch (error) {
+      console.error("Ошибка при получении данных пользователя:", error);
+      res.status(500).json({ message: "Ошибка сервера" });
+      return;
+    }
+  }
+);
 
 runApp(() => {
   app.listen(port, async () => {

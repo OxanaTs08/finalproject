@@ -15,6 +15,7 @@ import {
   searchUsersByName,
   showUser,
   updateUser,
+  showCurrentUser,
 } from "../controllers/user";
 import authenticateJWT from "../middleWares/authMiddleWare";
 
@@ -22,6 +23,7 @@ const router = Router();
 
 router.post("/register", registerController);
 router.post("/login", loginController);
+router.get("/currentuser", authenticateJWT, showCurrentUser);
 router.get("/showall", authenticateJWT, showAllUsers);
 router.get(
   "/showallexceptcurrentuser",
@@ -30,7 +32,7 @@ router.get(
 );
 router.put("/edit", authenticateJWT, updateUser);
 router.get("/:id", authenticateJWT, showUserById);
-router.post("/showone/bybody", authenticateJWT, showUser);
+router.get("/showone/bybody", authenticateJWT, showUser);
 router.put("/following/tofollow", authenticateJWT, toFollow);
 router.get("/following/ownfollowing", authenticateJWT, showOwnFollowings);
 router.get("/followers/ownfollowers", authenticateJWT, showownFollowers);

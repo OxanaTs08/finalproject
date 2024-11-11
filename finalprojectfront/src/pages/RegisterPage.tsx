@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import DialogWindow from "../components/DialogWindow";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
 import { registerUser } from "../redux/userSlice";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import Logo from "../assets/ICHGRALOGO 2.png";
@@ -85,7 +84,7 @@ const RegisterPage: React.FC = () => {
   useEffect(() => {
     if (open) {
       const timer = setTimeout(() => {
-        navigate("/login");
+        navigate("/");
       }, 3000);
       return () => clearTimeout(timer);
     }
@@ -217,7 +216,7 @@ const RegisterPage: React.FC = () => {
           <Typography color="#000000" sx={{ textAlign: "center" }}>
             Have an account
           </Typography>{" "}
-          <StyledNavLink to="/s">
+          <StyledNavLink to="/">
             {" "}
             <Typography color="#0095F6" sx={{ textAlign: "center" }}>
               Sign In

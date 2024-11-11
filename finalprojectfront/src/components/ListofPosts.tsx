@@ -17,7 +17,7 @@ const ListofPosts = () => {
   const currentUser = useSelector(
     (state: RootState) => state.users.currentUser
   );
-  console.log("Current user", currentUser);
+  // console.log("Current user", currentUser);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -32,7 +32,7 @@ const ListofPosts = () => {
     if (currentUserId) {
       dispatch(showPostsByFollowings());
     } else {
-      console.log("No currentUserId");
+      // console.log("No currentUserId");
     }
   }, [dispatch, currentUserId]);
 

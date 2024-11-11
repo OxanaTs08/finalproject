@@ -99,7 +99,8 @@ export const showPostById = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
-      return response.data;
+      console.log("Response:", response.data);
+      return response.data.post;
     } catch (error: any) {
       return rejectWithValue(error.response.data.message);
     }
@@ -265,6 +266,24 @@ export const postSlice = createSlice({
         }
       )
       .addCase(showAllPosts.rejected, (state, action) => {
+        state.isLoading = false;
+        if (state.isError !== null) {
+          state.isError = true;
+          state.message = action.payload as string;
+        }
+      })
+      .addCase(showPostById.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(
+        showPostById.fulfilled,
+        (state, action: PayloadAction<IPost | null>) => {
+          state.isLoading = false;
+          state.post = action.payload;
+        }
+      )
+      .addCase(showPostById.rejected, (state, action) => {
         state.isLoading = false;
         if (state.isError !== null) {
           state.isError = true;

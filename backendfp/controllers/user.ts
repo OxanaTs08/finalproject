@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { RequestHandler, Request, Response } from "express";
+import cloudinary from "../config/cloudinary";
 dotenv.config({ path: ".env" });
 
 const jwtSecret = process.env.JWT_SECRET || "";
@@ -139,6 +140,25 @@ export const showAllExceptCurrentUser = async (
   }
 };
 
+export const showCurrentUser: RequestHandler = async (
+  req: CustomRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+    res.status(200).json({ user });
+    return;
+  } catch (error: any) {
+    res.status(500).send(error.message);
+    return;
+  }
+};
+
 export const showUserById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -180,6 +200,17 @@ export const updateUser = async (req: CustomRequest, res: Response) => {
       res.status(400).json({ message: "At least one field is required" });
       return;
     }
+    let uploadedImageUrl: string | undefined;
+    if (avatarUrl) {
+      uploadedImageUrl = avatarUrl;
+      const result = await cloudinary.uploader.upload(avatarUrl, {
+        folder: "avatars",
+        resourse_type: "image",
+      });
+      uploadedImageUrl = result.url;
+      req.body.avatarUrl = uploadedImageUrl;
+    }
+
     const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
       new: true,
     });

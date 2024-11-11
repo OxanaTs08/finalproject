@@ -9,9 +9,9 @@ import authenticateJWT from "../middleWares/authMiddleWare";
 
 const router = Router();
 
-router.post("/create/:id", authenticateJWT, createComment);
-router.get("/showall/:id", authenticateJWT, showAllComments);
+router.post("/createcomment/", authenticateJWT, createComment);
+router.get("/showallcomment", authenticateJWT, showAllComments);
 router.delete("/delete/:postId/:id", authenticateJWT, deleteComment);
-router.put("/update/:postId/:commentId", authenticateJWT, updateComment);
+router.put("/updatecomment", authenticateJWT, updateComment);
 
 export default router;

@@ -1,11 +1,7 @@
 import {
-  Backdrop,
-  Button,
   Dialog,
-  DialogActions,
   DialogContent,
-  DialogTitle,
-  DialogContentText,
+  Button,
   Card,
   Box,
   Stack,
@@ -14,29 +10,41 @@ import {
   Paper,
   Typography,
   Grid,
+  CardMedia,
+  Divider,
+  styled,
 } from "@mui/material";
-import { IPost, showPostById } from "../redux/postSlice";
+import { showPostById } from "../redux/postSlice";
 import { createLike } from "../redux/likeSlice";
-import { IUser, userById } from "../redux/userSlice";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useAppDispatch } from "../hooks/useAppDispatch";
-import { Root } from "react-dom/client";
 import { RootState } from "../redux/store";
 import { useState } from "react";
-import { drawerWidth } from "../pages/MainPage";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useParams } from "react-router-dom";
 import FavoriteIcon from "@mui/icons-material/Favorite";
+import { NavLink } from "react-router-dom";
+import { userByIdBody } from "../redux/userSlice";
+
+const StyledNavLink = styled(NavLink)(() => ({
+  color: "rgba(40, 40, 40, 1)",
+  textDecoration: "none",
+  "&:hover": {
+    cursor: "pointer",
+    color: "rgba(40, 40, 40, 0.5)",
+  },
+}));
 
 const PostPage = () => {
   const dispatch = useAppDispatch();
   const [isLiked, setIsLiked] = useState<boolean>(false);
 
-  // const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const currentUserId = useSelector(
     (state: RootState) => state.users.currentUser?._id
   );
+  console.log("currentUserId", currentUserId);
   const currentUser = useSelector(
     (state: RootState) => state.users.currentUser
   );
@@ -51,8 +59,22 @@ const PostPage = () => {
     }
   }, [dispatch]);
 
-  const post = useSelector((state: RootState) => state.posts.post);
+  const postData = useSelector((state: RootState) => state.posts);
+  const posts = postData.posts || [];
+  const post = posts.find((post) => post._id === id);
+  console.log("post", post);
+  const user = post?.user;
+  console.log("user in post", user);
   const postId = post?._id;
+  console.log("postId", postId);
+  // const userId = post?.user;
+  // console.log("user who wrote the post", userId);
+
+  // useEffect(() => {
+  //   if (userId) {
+  //     dispatch(userByIdBody(userId));
+  //   }
+  // }, [dispatch, userId]);
 
   const [likesCount, setLikesCount] = useState<number>(
     post?.likes !== undefined ? post?.likes.length : 0
@@ -82,30 +104,42 @@ const PostPage = () => {
     }
   };
 
-  // const handleClickOpen = () => {
-  //   setOpen(true);
-  // };
+  const handleSettings = () => {
+    console.log("Settings clicked");
+    handleClickOpen();
+  };
 
-  // const handleClose = () => {
-  //   setOpen(false);
-  // };
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <>
       <Card>
         <Box sx={{ display: "flex", flexDirection: "row" }}>
-          <Box sx={{ width: "50%" }}>here is image</Box>
+          <Box sx={{ width: "50%" }}>
+            <CardMedia
+              component="img"
+              height="194"
+              image={post?.images.join(", ")}
+              alt="post"
+            />
+          </Box>
           <Stack sx={{ width: "50%" }}>
             <Paper sx={{ display: "flex", flexDirection: "row" }}>
-              <Avatar>image</Avatar>
-              <IconButton aria-label="settings">
+              <Avatar src={user?.avatarUrl}></Avatar>
+              <IconButton aria-label="settings" onClick={handleSettings}>
                 <MoreVertIcon />
               </IconButton>
             </Paper>
             <Paper>
-              <Avatar>image</Avatar>
-              <Typography>name</Typography>
-              <Typography>text</Typography>
+              <Avatar src={user?.avatarUrl} />
+              <Typography>{user?.username}</Typography>
+              <Typography>{post?.content}</Typography>
               <Grid container spacing={2} justifyContent="center">
                 {/* {users && */}
                 {/* users.map((user: IUser) => ( */}
@@ -130,39 +164,30 @@ const PostPage = () => {
           </Stack>
         </Box>
       </Card>
-      {/* <Backdrop
-        open={open}
-        onClick={handleClose}
-        style={{
-          backgroundColor: "rgba(0, 0, 0, 0.3)",
-          zIndex: 1000,
-          position: "absolute",
-          left: drawerWidth,
-          width: `calc(100% - ${drawerWidth}px)`,
-        }}
-      />
       <Dialog
         open={open}
         onClose={handleClose}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          {"Use Google's location service?"}
-        </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Let Google help apps determine location. This means sending
-            anonymous location data to Google, even when no apps are running.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Disagree</Button>
-          <Button onClick={handleClose} autoFocus>
-            Agree
+          <Button variant="text">Delete</Button>
+          <Divider />
+          <StyledNavLink to={"/edit"}>
+            <Button variant="text">Edit</Button>
+          </StyledNavLink>
+          <Divider />
+          <Button variant="text" onClick={handleClose}>
+            Go to Post
           </Button>
-        </DialogActions>
-      </Dialog> */}
+          <Divider />
+          <Button variant="text">Copy Link</Button>
+          <Divider />
+          <Button variant="text" onClick={handleClose}>
+            Cancel
+          </Button>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
