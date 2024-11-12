@@ -155,18 +155,22 @@ export const userById = createAsyncThunk(
 
 export const userByIdBody = createAsyncThunk(
   "user/showone/bybody",
-  async (_, { getState, rejectWithValue }) => {
+  async (id: string, { getState, rejectWithValue }) => {
     try {
       const token =
         (getState() as RootState).users.token || localStorage.getItem("token");
       if (!token) {
         return rejectWithValue("Authorization token is missing");
       }
-      const response = await axios.get(`${API_URL}/showone/bybody`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.post(
+        `${API_URL}/showone/bybody`,
+        { id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return response.data.user;
     } catch (error: any) {
       return rejectWithValue(error.response.data.message);

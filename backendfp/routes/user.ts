@@ -32,7 +32,7 @@ router.get(
 );
 router.put("/edit", authenticateJWT, updateUser);
 router.get("/:id", authenticateJWT, showUserById);
-router.get("/showone/bybody", authenticateJWT, showUser);
+router.post("/showone/bybody", authenticateJWT, showUser);
 router.put("/following/tofollow", authenticateJWT, toFollow);
 router.get("/following/ownfollowing", authenticateJWT, showOwnFollowings);
 router.get("/followers/ownfollowers", authenticateJWT, showownFollowers);

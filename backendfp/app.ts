@@ -6,6 +6,7 @@ import { runApp } from "./db/index";
 import userRouter from "./routes/user";
 import postRouter from "./routes/post";
 import commentRouter from "./routes/comment";
+import roomRouter from "./routes/room";
 import notificationRouter from "./routes/notifications";
 import authenticateJWT from "./middleWares/authMiddleWare";
 import { User } from "./models/userModel";
@@ -21,6 +22,7 @@ app.use("/user", userRouter);
 app.use("/post", postRouter);
 app.use("/comment", commentRouter);
 app.use("/notification", notificationRouter);
+app.use("/room", roomRouter);
 
 interface JwtPayload {
   id: string;

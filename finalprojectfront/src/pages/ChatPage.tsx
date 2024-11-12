@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import Picker from "emoji-picker-react";
 import {
   Box,
@@ -19,7 +19,7 @@ import { useSelector } from "react-redux";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { headerWidth } from "../components/Header";
 import { RootState } from "../redux/store";
-import { IUser, userById } from "../redux/userSlice";
+import { IUser, userById, userByIdBody } from "../redux/userSlice";
 import { IRoom, showRooms } from "../redux/roomSlice";
 
 interface IMessage {
@@ -29,76 +29,149 @@ interface IMessage {
   createdAt: Date;
 }
 
-const sockets = io("http://localhost:4003");
+// const sockets = io("http://localhost:4003");
 
 function ChatPage() {
   const dispatch = useAppDispatch();
   const [receiverId, setReceiverId] = useState<string | null>(null);
-  // const [searchParams, setSearchParams] = useState({});
   const location = useLocation();
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [value, setValue] = useState("");
-  // const [showEmoji, setShowEmoji] = useState(false);
+  const [showEmoji, setShowEmoji] = useState(false);
   const navigate = useNavigate();
 
-  const currentUserId = useSelector(
-    (state: RootState) => state.users.currentUser?._id
+  const currentUserId: string | null = useSelector(
+    (state: RootState) => state.users.currentUser?._id ?? null
   );
+  console.log("currentUserId in chat page", currentUserId);
 
-  // const users = useSelector((state: RootState) => state.users);
+  useEffect(() => {
+    dispatch(showRooms());
+  }, [dispatch]);
+
   const rooms: IRoom[] | null = useSelector(
-    (state: RootState) => state.rooms.rooms
+    (state: RootState) => state.rooms.rooms || []
   );
+  console.log("rooms in chatpage", rooms);
+
+  const room: IRoom | null = rooms.length > 0 ? rooms[0] : null;
+
+  console.log("room in chatpage", room);
+
+  const corresponderId: IUser | undefined = room?.users.find(
+    (user: IUser) => user._id !== currentUserId
+  );
+  console.log("correponderId in chatpage", corresponderId);
 
   useEffect(() => {
-    const locationPath = location.pathname;
-    if (locationPath.includes("/chatpage") && currentUserId) {
-      dispatch(showRooms());
+    if (corresponderId) {
+      dispatch(userById(corresponderId._id));
     }
-  }, [dispatch, currentUserId]);
+  });
+  const corresponder: IUser | null = useSelector(
+    (state: RootState) => state.users.user
+  );
+  console.log("corresponder in chatpage", corresponder);
 
-  useEffect(() => {
-    const locationPath = location.pathname;
-    if (locationPath.includes("/chatpage") && currentUserId && receiverId) {
-      dispatch(userById(receiverId));
-      sockets.emit("join", {
-        senderId: currentUserId,
-        receiverId,
-      });
-      sockets.emit("getPreviousMessages", {
-        senderId: currentUserId,
-        receiverId,
-      });
-    }
-    return () => {
-      sockets.emit("leftRoom", { sender: currentUserId });
-    };
-  }, [location.search, dispatch, currentUserId, receiverId]);
+  const username = corresponder?.username;
+  console.log("username in chatpage", username);
 
-  useEffect(() => {
-    sockets.on("message", ({ data }) => {
-      setMessages((prev) => [...prev, data.user]);
+  const avatarUrl = corresponder?.avatarUrl;
+  console.log("avatarUrl in chatpage", avatarUrl);
+
+  const [socket, setSocket] = useState<Socket | null>(null);
+
+  const handleUserClick = (selectedUser: IUser) => {
+    setReceiverId(selectedUser?._id);
+    navigate(`/ChatPage/${selectedUser._id}`, {
+      state: { receiverId: selectedUser._id },
     });
 
-    // sockets.on("startTyping", () => {s
-    //   console.log("start typing");
-    // });
-
-    // sockets.on("stopTyping", () => {
-    //   console.log("stop typing");
-    // });
-
-    sockets.on("previousMessages", (previousMessages) => {
-      setMessages(previousMessages);
+    console.log("Emitting selectedUser with receiverId:", receiverId);
+    socket?.emit("selectedtUser", {
+      receiverId: selectedUser._id,
     });
+  };
 
-    return () => {
-      sockets.off("message");
-      // sockets.off("startTyping");
-      // sockets.off("stopTyping");
-      sockets.off("previousMessages");
-    };
-  }, []);
+  // useEffect(() => {
+  //   const locationPath = location.pathname;
+
+  //   if (locationPath.includes("/chatpage") && currentUserId) {
+  //     const newSocket = io("http://localhost:4003");
+  //     setSocket(newSocket);
+  //     newSocket.on("connect", () => {
+  //       if (receiverId) {
+  //         newSocket.emit("join", { senderId: currentUserId, receiverId });
+  //         newSocket.emit("getPreviousMessages", {
+  //           senderId: currentUserId,
+  //           receiverId,
+  //         });
+  //       }
+  //     });
+  //     newSocket.on("message", ({ data }) =>
+  //       setMessages((prev) => [...prev, data.user])
+  //     );
+  //     newSocket.on("previousMessages", (previousMessages) =>
+  //       setMessages(previousMessages)
+  //     );
+
+  //     return () => {
+  //       newSocket.emit("leftRoom", { sender: currentUserId });
+  //       newSocket.close();
+  //     };
+  //   }
+
+  //   return () => {
+  //     if (socket) {
+  //       socket.emit("leftRoom", { sender: currentUserId });
+  //       socket.close();
+  //       setSocket(null);
+  //     }
+  //   };
+  // }, [location.pathname, currentUserId, receiverId]);
+
+  // useEffect(() => {
+  //   const locationPath = location.pathname;
+  //   if (locationPath.includes("/chatpage") && currentUserId && receiverId) {
+  //     dispatch(userById(receiverId));
+  //     sockets.emit("join", {
+  //       senderId: currentUserId,
+  //       receiverId,
+  //     });
+  //     sockets.emit("getPreviousMessages", {
+  //       senderId: currentUserId,
+  //       receiverId,
+  //     });
+  //   }
+  //   return () => {
+  //     sockets.emit("leftRoom", { sender: currentUserId });
+  //   };
+  // }, [location.search, dispatch, currentUserId, receiverId]);
+
+  // useEffect(() => {
+  //   sockets.on("message", ({ data }) => {
+  //     setMessages((prev) => [...prev, data.user]);
+  //   });
+
+  // sockets.on("startTyping", () => {s
+  //   console.log("start typing");
+  // });
+
+  // sockets.on("stopTyping", () => {
+  //   console.log("stop typing");
+  // });
+
+  // sockets.on("previousMessages", (previousMessages) => {
+  //   setMessages(previousMessages);
+  // });
+
+  // return () => {
+  //   sockets.off("message");
+  // sockets.off("startTyping");
+  // sockets.off("stopTyping");
+  //     sockets.off("previousMessages");
+  //   };
+  // }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
@@ -112,8 +185,8 @@ function ChatPage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
-    if (value) {
-      sockets.emit("sendMessage", {
+    if (value && socket) {
+      socket.emit("sendMessage", {
         message: value,
         receiverId,
       });
@@ -130,20 +203,8 @@ function ChatPage() {
     }
   };
 
-  // const toggleEmoji = () => {
-  //   setShowEmoji(!showEmoji);
-  // };
-
-  const handleUserClick = (selectedUser: IUser) => {
-    setReceiverId(selectedUser._id);
-    navigate(`/ChatPage/${selectedUser._id}`, {
-      state: { receiverId: selectedUser._id },
-    });
-
-    console.log("Emitting selectedUser with receiverId:", receiverId);
-    sockets.emit("selectedtUser", {
-      receiverId: selectedUser._id,
-    });
+  const toggleEmoji = () => {
+    setShowEmoji(!showEmoji);
   };
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
@@ -160,7 +221,7 @@ function ChatPage() {
         gap: 2,
       }}
     >
-      <Drawer
+      {/* <Drawer
         anchor="left"
         open={isDrawerOpen}
         // onClose={toggleDrawer(false)}
@@ -170,35 +231,35 @@ function ChatPage() {
             marginLeft: `${headerWidth}px`,
           },
         }}
-      >
+      > */}
+      <Box>
         <Box>
           {rooms?.length ? (
             <List>
-              {rooms?.map((room: IRoom) => {
-                const receiver = room.users.find(
-                  (user: IUser) => user._id !== currentUserId
-                );
-                return (
-                  receiver && (
-                    <ListItem key={room._id}>
-                      <Box onClick={() => handleUserClick(receiver)}>
-                        <Avatar
-                          onClick={() => navigate(`/profile/${receiver?._id}`)}
-                          sx={{ cursor: "pointer" }}
-                          src={receiver?.avatarUrl}
-                        />
-                        <ListItemText primary={receiver.username} />
-                      </Box>
-                    </ListItem>
-                  )
-                );
-              })}
+              {rooms.map((room) => (
+                <ListItem key={room._id}>
+                  {corresponderId && (
+                    <Box
+                    // onClick={() =>
+                    // handleUserClick(receiver)}
+                    >
+                      <Avatar
+                        onClick={() => navigate(`/profile/${corresponderId}`)}
+                        sx={{ cursor: "pointer" }}
+                        src={avatarUrl}
+                      />
+                      <ListItemText primary={username} />
+                    </Box>
+                  )}
+                </ListItem>
+              ))}
             </List>
           ) : (
             <Typography variant="h6">No rooms</Typography>
           )}
         </Box>
-      </Drawer>
+      </Box>
+      {/* </Drawer> */}
       <Box
         sx={{
           border: "1px solid grey",

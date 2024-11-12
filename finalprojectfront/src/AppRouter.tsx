@@ -4,7 +4,7 @@ import Layout from "./pages/Layout";
 import RegisterPage from "./pages/RegisterPage";
 import UserPage from "./components/UserPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import MainPage from "./pages/MainPage";
+// import MainPage from "./pages/MainPage";
 import ListofPosts from "./components/ListofPosts";
 import MyProfile from "./components/MyProfile";
 import CreatePost from "./components/CreatePost";
@@ -27,13 +27,13 @@ const AppRouter = () => {
           <Route path="*" element={<PageNotFound />} />
 
           <Route path="/posts" element={<ListofPosts />} />
-          <Route path="/mainpage" element={<MainPage />} />
+          {/* <Route path="/mainpage" element={<MainPage />} /> */}
           <Route path="/create" element={<CreatePost />} />
           <Route path="/post/:id" element={<PostPage />} />
           <Route path="/profile/:id" element={<UserPage />} />
           <Route path="/myprofile" element={<MyProfile />} />
           <Route path="/explore" element={<ExplorePage />} />
-          <Route path="/updatprofile" element={<EditProfile />} />
+          <Route path="/updateprofile" element={<EditProfile />} />
           <Route path="/chatpage" element={<ChatPage />} />
 
           {/* <Route

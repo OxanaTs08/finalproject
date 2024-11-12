@@ -92,6 +92,7 @@ const EditProfile = () => {
 
   const handleClose = () => {
     setOpen(false);
+    navigate("/myprofile");
   };
 
   return (

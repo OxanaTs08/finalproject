@@ -3,6 +3,7 @@ import { useAppDispatch } from "../hooks/useAppDispatch";
 import { RootState } from "../redux/store";
 import { IUser, userById, createFollowing } from "../redux/userSlice";
 import { IPost, postsByAnotherUser } from "../redux/postSlice";
+import { createRoom } from "../redux/roomSlice";
 import { useEffect, useState } from "react";
 import { Box, Typography, Stack, Grid, CardMedia, styled } from "@mui/material";
 import MainButton from "./MainButton";
@@ -72,6 +73,17 @@ const UserPage = () => {
     }
   };
 
+  const handleOpenChat = () => {
+    console.log("current user in handleOpenChat", currentUser);
+    console.log("user id in handleOpenChat", userId);
+    if (currentUser && userId) {
+      navigate("/chatpage");
+      dispatch(createRoom({ senderId: currentUser._id, receiverId: userId }));
+    } else {
+      console.error("No current user");
+    }
+  };
+
   return (
     <>
       <Stack sx={{ gap: "16px" }}>
@@ -85,12 +97,18 @@ const UserPage = () => {
                 {/* <MainButton
                   buttonText="Edit Profile"
                   onClick={() => {
-                    navigate(`/${currentUserId}/edit`);
+                    navigate("/updateprofile");
                   }}
                 /> */}
                 <MainButton
                   buttonText={isFollowing ? "Unfollow" : "Follow"}
                   onClick={handleToggleFollow}
+                />
+                <MainButton
+                  buttonText="Message"
+                  onClick={() => {
+                    handleOpenChat();
+                  }}
                 />
               </Box>
               <Box sx={{ display: "flex", flexDirection: "row" }}>

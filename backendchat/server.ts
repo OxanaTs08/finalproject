@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 import roomRouter from "./routes/auth";
 import cors from "cors";
 import { Server } from "socket.io";
-import { Socket } from "socket.io";
+import { initializedSocket } from "./socket";
 
 dotenv.config({ path: ".env" });
 const port = 4003;
@@ -26,6 +26,15 @@ mongoose
   .catch((error) => {
     console.log("Mongoose connection failed:", error);
   });
+
+const io = new Server({
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
+
+initializedSocket(io);
 
 server.listen(port, () => {
   console.log(`Сервер запущен на порту ${port}`);

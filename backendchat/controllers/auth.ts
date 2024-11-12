@@ -1,12 +1,17 @@
-import { Room } from "../models/roomModel";
+import { IRoom, Room } from "../models/roomModel";
 import { Message } from "../models/messageModel";
 import { Server } from "socket.io";
 import { RequestHandler, Request, Response } from "express";
 
-export const getOrCreateRoom = async (req: Request, res: Response) => {
+export const getOrCreateRoom = async (
+  req: Request,
+  res: Response
+): Promise<IRoom | null> => {
   const { senderId, receiverId, messages } = req.body;
   try {
-    let room = await Room.findOne({ users: { $all: [senderId, receiverId] } });
+    let room: IRoom | null = await Room.findOne({
+      users: { $all: [senderId, receiverId] },
+    });
 
     if (!room) {
       room = new Room({
@@ -18,9 +23,39 @@ export const getOrCreateRoom = async (req: Request, res: Response) => {
         messages: [],
       });
       return newRoom;
+    } else {
+      return room;
     }
   } catch (error: any) {
     console.log(error);
+    return null;
+  }
+};
+
+export const CreateRoom = async (req: Request, res: Response) => {
+  try {
+    const { senderId, receiverId } = req.body;
+
+    const existingRoom = await Room.findOne({
+      users: { $all: [senderId, receiverId] },
+    });
+
+    if (existingRoom) {
+      res
+        .status(400)
+        .json({ message: "Room already exists", room: existingRoom });
+      return;
+    }
+
+    const newRoom = await Room.create({
+      users: [senderId, receiverId],
+      messages: [],
+    });
+    res.status(201).json({ message: "Room is created successfully", newRoom });
+    return;
+  } catch (error) {
+    res.status(500).json({ message: "error while creating room" });
+    return;
   }
 };
 

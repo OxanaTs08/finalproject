@@ -44,7 +44,7 @@ const menu = [
     icon: ExploreOutlinedIcon,
   },
   {
-    path: "/posts",
+    path: "/chatpage",
     name: "Messages",
     icon: MessageOutlinedIcon,
   },

@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { getOrCreateRoom, showRooms } from "../controllers/auth";
+import { CreateRoom, showRooms } from "../controllers/auth";
 
 const router = Router();
 
 router.get("/showAll", showRooms);
+// router.post("/createroom", CreateRoom);
 
 // router.post("/login", loginController, authenticateJWT);
 

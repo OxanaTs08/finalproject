@@ -82,6 +82,7 @@ const CreatePost = () => {
 
   const handleClose = () => {
     setOpen(false);
+    navigate("/myprofile");
   };
 
   return (

@@ -172,7 +172,7 @@ export const showUserById: RequestHandler = async (req, res) => {
 
 export const showUser: RequestHandler = async (req, res) => {
   try {
-    const id = req.body;
+    const { id } = req.body;
     if (!id) {
       res.status(400).json({ message: "User id is missing " });
       return;
