@@ -41,7 +41,7 @@ export const showRooms = async (req: CustomRequest, res: Response) => {
       return;
     }
 
-    let rooms = await Room.find({ users: { $in: [userId] } });
+    let rooms = await Room.find({ users: { $in: [userId] } }).populate("users");
 
     res.status(201).json({ rooms });
   } catch (error) {

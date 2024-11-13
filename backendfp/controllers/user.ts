@@ -143,7 +143,7 @@ export const showAllExceptCurrentUser = async (
 export const showCurrentUser: RequestHandler = async (
   req: CustomRequest,
   res: Response
-): Promise<void> => {
+) => {
   try {
     const userId = req.user?.id;
     const user = await User.findById(userId);

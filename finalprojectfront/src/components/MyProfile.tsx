@@ -65,7 +65,7 @@ const MyProfile = () => {
                 <MainButton
                   buttonText="Edit Profile"
                   onClick={() => {
-                    navigate("/updatprofile");
+                    navigate("/updateprofile");
                   }}
                 />
               </Box>

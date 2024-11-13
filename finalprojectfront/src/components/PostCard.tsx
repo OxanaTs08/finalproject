@@ -50,7 +50,7 @@ const PostCard = ({ post }: { post: IPost }) => {
   );
 
   const user = post.user;
-  console.log("user who wrote the post", user);
+  // console.log("user who wrote the post", user);
   const username = user?.username;
   const userId = user?._id;
   const profilePicture = user?.avatarUrl;

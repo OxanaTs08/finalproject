@@ -1,31 +1,30 @@
-import { Navigate } from "react-router-dom";
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React from "react";
+import { Navigate, Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "./redux/store";
-import { showCurrentUser } from "./redux/userSlice";
-import { useAppDispatch } from "./hooks/useAppDispatch";
+import { useState, useEffect } from "react";
 
-interface PrivateRouteProps {
-  Component: React.ComponentType;
-}
-
-const PrivateRoute = ({ Component }: PrivateRouteProps) => {
-  const dispatch = useAppDispatch();
-
-  const isAuthenticated = useSelector(
-    (state: RootState) => state.users.currentUser
-  );
-
-  const isLoading = useSelector((state: RootState) => state.users.isLoading);
-  // const [isAuthenticated, setIsAuthenticated] = useState(false);
+const PrivateRoute: React.FC = () => {
+  const [isTokenLoaded, setIsTokenLoaded] = useState(false);
+  const token = useSelector((state: RootState) => state.users.token);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      dispatch(showCurrentUser());
+    if (token !== null) {
+      setIsTokenLoaded(true);
     }
-  }, [dispatch, isAuthenticated]);
+  }, [token]);
 
-  return isAuthenticated ? <Component /> : <Navigate to="/login" />;
+  console.log("token in private route:", token);
+
+  const currentUser = useSelector(
+    (state: RootState) => state.users.currentUser
+  );
+  console.log("Current user in private route", currentUser);
+
+  if (!isTokenLoaded) {
+    return <div>Loading...</div>;
+  }
+  return currentUser ? <Outlet /> : <Navigate to="/" replace />;
 };
+
 export default PrivateRoute;

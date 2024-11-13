@@ -93,6 +93,7 @@ export const loginUser = createAsyncThunk(
 export const showCurrentUser = createAsyncThunk(
   "user/currentuser",
   async (_, { getState, rejectWithValue }) => {
+    console.log("Fetching current user...");
     try {
       const token: string | null =
         (getState() as RootState).users.token || localStorage.getItem("token");

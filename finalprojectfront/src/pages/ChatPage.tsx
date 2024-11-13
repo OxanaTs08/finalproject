@@ -58,25 +58,15 @@ function ChatPage() {
 
   console.log("room in chatpage", room);
 
-  const corresponderId: IUser | undefined = room?.users.find(
+  const receiver: IUser | undefined = room?.users.find(
     (user: IUser) => user._id !== currentUserId
   );
-  console.log("correponderId in chatpage", corresponderId);
+  console.log("correponderId in chatpage", receiver);
 
-  useEffect(() => {
-    if (corresponderId) {
-      dispatch(userById(corresponderId._id));
-    }
-  });
-  const corresponder: IUser | null = useSelector(
-    (state: RootState) => state.users.user
-  );
-  console.log("corresponder in chatpage", corresponder);
-
-  const username = corresponder?.username;
+  const username = receiver?.username;
   console.log("username in chatpage", username);
 
-  const avatarUrl = corresponder?.avatarUrl;
+  const avatarUrl = receiver?.avatarUrl;
   console.log("avatarUrl in chatpage", avatarUrl);
 
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -238,13 +228,10 @@ function ChatPage() {
             <List>
               {rooms.map((room) => (
                 <ListItem key={room._id}>
-                  {corresponderId && (
-                    <Box
-                    // onClick={() =>
-                    // handleUserClick(receiver)}
-                    >
+                  {receiver && (
+                    <Box onClick={() => handleUserClick(receiver)}>
                       <Avatar
-                        onClick={() => navigate(`/profile/${corresponderId}`)}
+                        // onClick={() => navigate(`/profile/${receiver._id}`)}
                         sx={{ cursor: "pointer" }}
                         src={avatarUrl}
                       />
