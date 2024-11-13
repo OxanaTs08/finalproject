@@ -18,7 +18,7 @@ function App() {
       dispatch(showCurrentUser());
       console.log("1");
     }
-  }, [currentUser]);
+  }, []);
 
   console.log("Current user in App:", currentUser);
 

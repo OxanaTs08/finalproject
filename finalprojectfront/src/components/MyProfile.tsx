@@ -39,16 +39,15 @@ const MyProfile = () => {
   );
   console.log("Current user", currentUser);
   const isLoading = useSelector((state: RootState) => state.users.isLoading);
-
-  if (isLoading) return <div>Loading...</div>;
-  if (!currentUser) return <div>User not found or unauthorized</div>;
-
   const postsData = useSelector((state: RootState) => state.posts);
   const posts = postsData.posts || [];
 
   useEffect(() => {
     dispatch(postsByUser());
   }, [dispatch]);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (!currentUser) return <div>User not found or unauthorized</div>;
 
   return (
     <>

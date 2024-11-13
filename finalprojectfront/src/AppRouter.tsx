@@ -13,7 +13,7 @@ import ExplorePage from "./pages/ExplorePage";
 import EditProfile from "./components/EditProfile";
 import PageNotFound from "./pages/PageNotFound";
 import ChatPage from "./pages/ChatPage";
-import PrivateRoute from "./PrivateRoute";
+// import PrivateRoute from "./PrivateRoute";
 
 const AppRouter = () => {
   return (
@@ -24,18 +24,18 @@ const AppRouter = () => {
         <Route path="*" element={<PageNotFound />} />
         <Route path="/forgotpassword" element={<ResetPasswordPage />} />
         <Route path="*" element={<PageNotFound />} />
-        <Route element={<PrivateRoute />}>
-          <Route path="/" element={<Layout />}>
-            <Route path="/posts" element={<ListofPosts />} />
-            <Route path="/create" element={<CreatePost />} />
-            <Route path="/post/:id" element={<PostPage />} />
-            <Route path="/profile/:id" element={<UserPage />} />
-            <Route path="/myprofile" element={<MyProfile />} />
-            <Route path="/explore" element={<ExplorePage />} />
-            <Route path="/updateprofile" element={<EditProfile />} />
-            <Route path="/chatpage" element={<ChatPage />} />
-          </Route>
+        {/* <Route element={<PrivateRoute />}> */}
+        <Route path="/" element={<Layout />}>
+          <Route path="/posts" element={<ListofPosts />} />
+          <Route path="/create" element={<CreatePost />} />
+          <Route path="/post/:id" element={<PostPage />} />
+          <Route path="/profile/:id" element={<UserPage />} />
+          <Route path="/myprofile" element={<MyProfile />} />
+          <Route path="/explore" element={<ExplorePage />} />
+          <Route path="/updateprofile" element={<EditProfile />} />
+          <Route path="/chatpage" element={<ChatPage />} />
         </Route>
+        {/* </Route> */}
       </Routes>
     </BrowserRouter>
   );
