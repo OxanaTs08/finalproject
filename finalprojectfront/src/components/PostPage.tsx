@@ -67,14 +67,6 @@ const PostPage = () => {
   console.log("user in post", user);
   const postId = post?._id;
   console.log("postId", postId);
-  // const userId = post?.user;
-  // console.log("user who wrote the post", userId);
-
-  // useEffect(() => {
-  //   if (userId) {
-  //     dispatch(userByIdBody(userId));
-  //   }
-  // }, [dispatch, userId]);
 
   const [likesCount, setLikesCount] = useState<number>(
     post?.likes !== undefined ? post?.likes.length : 0

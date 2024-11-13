@@ -61,7 +61,7 @@ export const showAllComments = async (
 ): Promise<void> => {
   try {
     const userId = req.user?.id;
-    const { id } = req.body;
+    const { postid } = req.body;
 
     if (!userId) {
       res.status(401).json({ message: "Unauthorized in auth" });
@@ -73,14 +73,14 @@ export const showAllComments = async (
       res.status(404).json({ message: "User not found" });
       return;
     }
-    const post = await Post.findById(id);
+    const post = await Post.findById(postid);
     if (!post) {
       res.status(404).json({ message: "Post not found" });
       return;
     }
 
-    const comment = await Comment.find();
-    res.status(201).json({ comments: comment });
+    const comments = await Comment.find({ post: postid }).populate("user");
+    res.status(201).json({ comments: comments });
     return;
   } catch (error) {
     res.status(500).json({ message: "error while fetching posts" });
