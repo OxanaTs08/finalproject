@@ -11,13 +11,13 @@ interface CustomRequest extends Request {
 
 export const createComment = async (req: CustomRequest, res: Response) => {
   try {
-    const { id, text } = req.body;
+    const { postId, text } = req.body;
     if (!text) {
       res.status(400).json({ message: "text is required" });
       return;
     }
-    const post = await Post.findById(id);
-    if (!post) {
+    const post = await Post.findById(postId);
+    if (!postId) {
       res.status(404).json({ message: "Post not found" });
       return;
     }
@@ -38,9 +38,9 @@ export const createComment = async (req: CustomRequest, res: Response) => {
     const newComment = await Comment.create({
       text,
       user: userId,
-      post: id,
+      post: postId,
     });
-    await Post.findByIdAndUpdate(id, {
+    await Post.findByIdAndUpdate(postId, {
       $push: {
         comments: newComment._id,
       },
@@ -61,7 +61,7 @@ export const showAllComments = async (
 ): Promise<void> => {
   try {
     const userId = req.user?.id;
-    const { postid } = req.body;
+    const { postId } = req.body;
 
     if (!userId) {
       res.status(401).json({ message: "Unauthorized in auth" });
@@ -73,13 +73,13 @@ export const showAllComments = async (
       res.status(404).json({ message: "User not found" });
       return;
     }
-    const post = await Post.findById(postid);
+    const post = await Post.findById(postId);
     if (!post) {
       res.status(404).json({ message: "Post not found" });
       return;
     }
 
-    const comments = await Comment.find({ post: postid }).populate("user");
+    const comments = await Comment.find({ post: postId }).populate("user");
     res.status(201).json({ comments: comments });
     return;
   } catch (error) {

@@ -9,10 +9,10 @@ import {
   IconButton,
   Paper,
   Typography,
-  Grid,
   CardMedia,
   Divider,
   styled,
+  TextField,
 } from "@mui/material";
 import { showPostById } from "../redux/postSlice";
 import { createLike } from "../redux/likeSlice";
@@ -25,7 +25,9 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { useParams } from "react-router-dom";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { NavLink } from "react-router-dom";
-import { userByIdBody } from "../redux/userSlice";
+import { showAllComments, createComment } from "../redux/commentSlice";
+import CommentIcon from "@mui/icons-material/ModeCommentOutlined";
+import { createNotification } from "../redux/notificationSlice";
 
 const StyledNavLink = styled(NavLink)(() => ({
   color: "rgba(40, 40, 40, 1)",
@@ -39,6 +41,7 @@ const StyledNavLink = styled(NavLink)(() => ({
 const PostPage = () => {
   const dispatch = useAppDispatch();
   const [isLiked, setIsLiked] = useState<boolean>(false);
+  const [newComment, setNewComment] = useState("");
 
   const [open, setOpen] = useState(false);
   const currentUserId = useSelector(
@@ -57,7 +60,7 @@ const PostPage = () => {
       window.scrollTo(0, 0);
       dispatch(showPostById(id));
     }
-  }, [dispatch]);
+  }, [dispatch, id]);
 
   const postData = useSelector((state: RootState) => state.posts);
   const posts = postData.posts || [];
@@ -77,6 +80,18 @@ const PostPage = () => {
       setIsLiked(post.likes.includes(currentUserId));
     }
   }, [post?.likes, currentUserId]);
+
+  useEffect(() => {
+    if (postId) {
+      dispatch(showAllComments(postId));
+    }
+  }, [dispatch, postId]);
+
+  const comments = useSelector((state: RootState) => state.comments.comments);
+  const comment = comments?.find((comment) => comment._id === id);
+  const commentUser = comment?.user;
+  const commentUserName = commentUser?.username;
+  const commentUserAvatar = commentUser?.avatarUrl;
 
   const handleToggleLike = async () => {
     if (!postId) return;
@@ -109,6 +124,26 @@ const PostPage = () => {
     setOpen(false);
   };
 
+  const handleAddComment = async () => {
+    if (newComment && postId) {
+      try {
+        await dispatch(
+          createComment({ postId: postId, text: newComment })
+        ).unwrap();
+        await dispatch(
+          createNotification({
+            post: post,
+            user: post.user,
+            type: "comment",
+          })
+        );
+        setNewComment("");
+      } catch (error) {
+        console.log("error while adding comment", error);
+      }
+    }
+  };
+
   return (
     <>
       <Card>
@@ -132,27 +167,44 @@ const PostPage = () => {
               <Avatar src={user?.avatarUrl} />
               <Typography>{user?.username}</Typography>
               <Typography>{post?.content}</Typography>
-              <Grid container spacing={2} justifyContent="center">
-                {/* {users && */}
-                {/* users.map((user: IUser) => ( */}
-                <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                  md={3}
-                  // key={}
-                >
-                  {/* <CommentCard user={user} /> */}
-                </Grid>
-                {/* ))} */}
-              </Grid>
+              <Stack>
+                {comments &&
+                  comments.map((comment) => (
+                    <Box key={comment._id}>
+                      <Avatar src={commentUserAvatar} />
+                      <Typography>{commentUserName}</Typography>
+                      <Typography>{comment?.text}</Typography>
+                    </Box>
+                  ))}
+              </Stack>
             </Paper>
-            <Paper>
-              <IconButton aria-label="like" onClick={handleToggleLike}>
-                <FavoriteIcon sx={{ color: isLiked ? "red" : "default" }} />
-              </IconButton>
-              <Typography>{likesCount} Likes</Typography>
-            </Paper>
+            <Stack>
+              <Box>
+                <IconButton aria-label="like" onClick={handleToggleLike}>
+                  <FavoriteIcon sx={{ color: isLiked ? "red" : "default" }} />
+                </IconButton>
+                <IconButton aria-label="comment">
+                  <CommentIcon />
+                </IconButton>
+              </Box>
+              <Box>
+                <Typography>{likesCount} Likes</Typography>
+              </Box>
+              <Box>
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  size="small"
+                  placeholder="Add a comment..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  sx={{ marginRight: 1 }}
+                />
+                <Button variant="contained" onClick={handleAddComment}>
+                  Post
+                </Button>
+              </Box>
+            </Stack>
           </Stack>
         </Box>
       </Card>

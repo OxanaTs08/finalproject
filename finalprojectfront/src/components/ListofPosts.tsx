@@ -21,20 +21,15 @@ const ListofPosts = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    dispatch(showPostsByFollowings());
-  }, [dispatch]);
-
-  const postsData = useSelector((state: RootState) => state.posts);
-  const posts = postsData.posts || [];
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
     if (currentUserId) {
       dispatch(showPostsByFollowings());
     } else {
-      // console.log("No currentUserId");
+      console.log("No currentUserId");
     }
   }, [dispatch, currentUserId]);
+
+  const postsData = useSelector((state: RootState) => state.posts);
+  const posts = postsData.posts || [];
 
   return (
     <Box

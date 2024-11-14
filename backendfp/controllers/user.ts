@@ -56,6 +56,7 @@ export const registerController: RequestHandler = async (req, res) => {
 
 export const loginController: RequestHandler = async (req, res) => {
   const { username, password } = req.body;
+
   if (!username || !password) {
     res.status(400).json({ message: "Username and password are required" });
     return;
@@ -85,7 +86,7 @@ export const loginController: RequestHandler = async (req, res) => {
     res.status(200).json({ token, user: await User.findById(foundUser._id) });
     return;
   } catch (error: any) {
-    res.status(500).send(error.message);
+    res.status(500).json({ message: error.message });
     return;
   }
 };

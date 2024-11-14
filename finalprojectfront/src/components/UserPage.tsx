@@ -10,6 +10,7 @@ import MainButton from "./MainButton";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { NavLink } from "react-router-dom";
+import { createNotification } from "../redux/notificationSlice";
 
 const StyledNavLink = styled(NavLink)(() => ({
   color: "rgba(40, 40, 40, 1)",
@@ -52,7 +53,7 @@ const UserPage = () => {
     if (currentUser?.followings && userId) {
       setIsFollowing(currentUser.followings.includes(userId));
     }
-  }, [currentUser?.followings, userId]);
+  }, [currentUser, userId]);
 
   const handleToggleFollow = async () => {
     // if (userId) return;
@@ -72,6 +73,29 @@ const UserPage = () => {
       console.error(error);
     }
   };
+
+  // const handleToggleFollow = async () => {
+  //   try {
+  //     if (isFollowing) {
+  //       // console.log("followingId in deleting", userId);
+  //       await dispatch(createFollowing({ followingId: userId }));
+  //       setIsFollowing((prev) => !prev);
+  //     } else {
+  //       // console.log("followingId in creating", userId);
+  //       await dispatch(createFollowing({ followingId: userId }));
+  //       setIsFollowing((prev) => !prev);
+  //       await dispatch(
+  //         createNotification({
+  //           post: post,
+  //           user: post.user,
+  //           type: "follow",
+  //         })
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const handleOpenChat = () => {
     console.log("current user in handleOpenChat", currentUser);
@@ -125,7 +149,7 @@ const UserPage = () => {
           {posts.length > 0 ? (
             posts.map((post: IPost) => (
               <Grid item xs={12} sm={6} md={3} key={post._id}>
-                <StyledNavLink to={`/post/:${post._id}`}>
+                <StyledNavLink to={`/post/${post._id}`}>
                   <CardMedia
                     component="img"
                     height="194"

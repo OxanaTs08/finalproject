@@ -43,6 +43,7 @@ const LogInPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [usernameError, setUsernameError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -59,18 +60,22 @@ const LogInPage = () => {
     if (!usernameError) {
       const loginData = { username, password };
       dispatch(loginUser(loginData));
-      navigate("/posts");
     }
   };
+
+  useEffect(() => {
+    if (token) {
+      navigate("/posts");
+    }
+    if (isError) {
+      setErrorMessage(message ?? "");
+    }
+  }, [token, isError, message, navigate]);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("token");
     if (!token || !savedToken) {
       dispatch(resetState());
-      // const timer = setTimeout(() => {
-      //   navigate("/MainPage");
-      // }, 1000);
-      // return () => clearTimeout(timer);
     }
   }, [token, navigate, dispatch, username]);
 
@@ -144,6 +149,11 @@ const LogInPage = () => {
                 />
               </Stack>
             </form>
+            {isError && (
+              <Typography color="error" sx={{ textAlign: "center" }}>
+                {errorMessage}
+              </Typography>
+            )}
             <Divider>
               {" "}
               <Typography color="#737373">OR</Typography>{" "}

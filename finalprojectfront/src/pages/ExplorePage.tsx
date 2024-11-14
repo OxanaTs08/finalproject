@@ -21,16 +21,6 @@ const ExplorePage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    dispatch(showAllPosts());
-  }, [dispatch]);
-
-  const postsData: { posts: IPost[] } = useSelector(
-    (state: RootState) => state.posts
-  );
-  const posts = postsData.posts || [];
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
     if (currentUserId) {
       dispatch(showAllPosts());
     } else {
@@ -38,25 +28,18 @@ const ExplorePage = () => {
     }
   }, [dispatch, currentUserId]);
 
+  const postsData: { posts: IPost[] } = useSelector(
+    (state: RootState) => state.posts
+  );
+  const posts = postsData.posts || [];
+
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "40px",
         paddingTop: "40px",
       }}
     >
-      <Grid
-        container
-        spacing={0}
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "repeat(5, 1fr)",
-          gridTemplateRows: "repeat(5, 1fr)",
-        }}
-        justifyContent="center"
-      >
+      <Grid container spacing={2} justifyContent="center">
         {posts &&
           posts.map((post: IPost) => (
             <Grid item xs={12} sm={6} md={3} key={post._id}>

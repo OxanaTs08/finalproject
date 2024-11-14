@@ -66,32 +66,46 @@ export const initializedSocket = (io: Server) => {
         const previousMessages = await Message.find({
           room: chatRoom,
         }).populate("sender", "username");
+
         socket.emit("previousMessages", previousMessages);
 
-        socket.on("sendMessage", async ({ message }: { message: string }) => {
-          if (!chatRoom || !currentUserId) {
-            console.log("user is not in a chat room");
-            return;
-          }
-          const newMessage = new Message({
-            room: chatRoom,
-            sender: currentUserId,
-            content: message,
-          });
-          await newMessage.save();
+        socket.on(
+          "sendMessage",
+          async ({
+            message,
+            receiverId,
+            senderId,
+            chatRoom,
+          }: {
+            message: string;
+            receiverId: string;
+            senderId: string;
+            chatRoom: string;
+          }) => {
+            if (!chatRoom || !currentUserId) {
+              console.log("user is not in a chat room");
+              return;
+            }
+            try {
+              const newMessage = new Message({
+                receiver: receiverId,
+                sender: currentUserId,
+                text: message,
+                room: chatRoom,
+              });
+              await newMessage.save();
 
-          await Room.findByIdAndUpdate(chatRoom, {
-            $push: { messages: newMessage._id },
-          });
-          io.to(chatRoom).emit("message", {
-            data: {
-              user: {
-                name: currentUserId,
-                message,
-              },
-            },
-          });
-        });
+              await Room.findByIdAndUpdate(chatRoom, {
+                $push: { messages: newMessage._id },
+              });
+              io.to(chatRoom).emit("message", {
+                data: newMessage,
+              });
+            } catch (error) {
+              console.error("Error saving message:", error);
+            }
+          }
+        );
 
         socket.on("leftRoom", async () => {
           if (currentUserId && chatRoom) {

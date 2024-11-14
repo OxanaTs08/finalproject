@@ -103,7 +103,7 @@ const EditProfile = () => {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Create your Post"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"Edit Profile"}</DialogTitle>
         <DialogContent>
           <form onSubmit={handleSubmit}>
             <input type="file" accept="image/*" onChange={handleImageChange} />

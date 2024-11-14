@@ -5,6 +5,7 @@ import likeSlice from "./likeSlice";
 import notificationSlice from "./notificationSlice";
 import roomSlice from "./roomSlice";
 import messageSlice from "./messageSlice";
+import commentSlice from "./commentSlice";
 
 const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
     notifications: notificationSlice,
     rooms: roomSlice,
     messages: messageSlice,
+    comments: commentSlice,
   },
 });
 

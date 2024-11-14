@@ -12,28 +12,24 @@ import {
   List,
   Avatar,
   ListItemText,
-  Drawer,
 } from "@mui/material";
 import MainButton from "../components/MainButton";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "../hooks/useAppDispatch";
-import { headerWidth } from "../components/Header";
 import { RootState } from "../redux/store";
-import { IUser, userById, userByIdBody } from "../redux/userSlice";
+import { IUser } from "../redux/userSlice";
 import { IRoom, showRooms } from "../redux/roomSlice";
+import { IMessage } from "../redux/messageSlice";
 
-interface IMessage {
-  sender: string;
-  receiver: string;
-  text: string;
-  createdAt: Date;
+interface Response {
+  error?: string;
 }
-
 // const sockets = io("http://localhost:4003");
 
 function ChatPage() {
   const dispatch = useAppDispatch();
   const [receiverId, setReceiverId] = useState<string | null>(null);
+  const [chatRoom, setChatRoom] = useState<string | null>(null);
   const location = useLocation();
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [value, setValue] = useState("");
@@ -43,7 +39,7 @@ function ChatPage() {
   const currentUserId: string | null = useSelector(
     (state: RootState) => state.users.currentUser?._id ?? null
   );
-  console.log("currentUserId in chat page", currentUserId);
+  // console.log("currentUserId in chat page", currentUserId);
 
   useEffect(() => {
     dispatch(showRooms());
@@ -52,23 +48,17 @@ function ChatPage() {
   const rooms: IRoom[] | null = useSelector(
     (state: RootState) => state.rooms.rooms || []
   );
-  console.log("rooms in chatpage", rooms);
-
+  // console.log("rooms in chatpage", rooms);
   const room: IRoom | null = rooms.length > 0 ? rooms[0] : null;
-
-  console.log("room in chatpage", room);
-
+  // console.log("room in chatpage", room);
   const receiver: IUser | undefined = room?.users.find(
     (user: IUser) => user._id !== currentUserId
   );
-  console.log("correponderId in chatpage", receiver);
-
+  // console.log("correponderId in chatpage", receiver);
   const username = receiver?.username;
-  console.log("username in chatpage", username);
-
+  // console.log("username in chatpage", username);
   const avatarUrl = receiver?.avatarUrl;
-  console.log("avatarUrl in chatpage", avatarUrl);
-
+  // console.log("avatarUrl in chatpage", avatarUrl);
   const [socket, setSocket] = useState<Socket | null>(null);
 
   const handleUserClick = (selectedUser: IUser) => {
@@ -77,48 +67,57 @@ function ChatPage() {
       state: { receiverId: selectedUser._id },
     });
 
-    console.log("Emitting selectedUser with receiverId:", receiverId);
-    socket?.emit("selectedtUser", {
-      receiverId: selectedUser._id,
-    });
+    // console.log("Emitting selectedUser with receiverId:", receiverId);
+    //точно ли нужно это комментить? мне нужно открытия нужной комнаты
+    // socket?.emit("selectedtUser", {
+    //   receiverId: selectedUser._id,
+    // });
   };
 
-  // useEffect(() => {
-  //   const locationPath = location.pathname;
+  useEffect(() => {
+    const locationPath = location.pathname;
 
-  //   if (locationPath.includes("/chatpage") && currentUserId) {
-  //     const newSocket = io("http://localhost:4003");
-  //     setSocket(newSocket);
-  //     newSocket.on("connect", () => {
-  //       if (receiverId) {
-  //         newSocket.emit("join", { senderId: currentUserId, receiverId });
-  //         newSocket.emit("getPreviousMessages", {
-  //           senderId: currentUserId,
-  //           receiverId,
-  //         });
-  //       }
-  //     });
-  //     newSocket.on("message", ({ data }) =>
-  //       setMessages((prev) => [...prev, data.user])
-  //     );
-  //     newSocket.on("previousMessages", (previousMessages) =>
-  //       setMessages(previousMessages)
-  //     );
+    if (
+      locationPath.includes("/chatpage") &&
+      currentUserId
+      // && receiverId
+    ) {
+      const newSocket = io("http://localhost:4003");
+      setSocket(newSocket);
 
-  //     return () => {
-  //       newSocket.emit("leftRoom", { sender: currentUserId });
-  //       newSocket.close();
-  //     };
-  //   }
+      newSocket.on("connect", () => {
+        if (receiverId) {
+          newSocket.emit("join", { senderId: currentUserId, receiverId });
+          newSocket.emit("getPreviousMessages", {
+            senderId: currentUserId,
+            receiverId,
+          });
+        }
+      });
 
-  //   return () => {
-  //     if (socket) {
-  //       socket.emit("leftRoom", { sender: currentUserId });
-  //       socket.close();
-  //       setSocket(null);
-  //     }
-  //   };
-  // }, [location.pathname, currentUserId, receiverId]);
+      newSocket.on("message", ({ data }) =>
+        setMessages((prev) => [...prev, data])
+      );
+      newSocket.on("previousMessages", (previousMessages) =>
+        setMessages(previousMessages)
+      );
+
+      return () => {
+        if (newSocket) {
+          newSocket.emit("leftRoom", { sender: currentUserId });
+          newSocket.close();
+        }
+      };
+    }
+
+    // return () => {
+    //   if (socket) {
+    //     socket.emit("leftRoom", { sender: currentUserId });
+    //     socket.close();
+    //     setSocket(null);
+    //   }
+    // };
+  }, [location.pathname, currentUserId, receiverId]);
 
   // useEffect(() => {
   //   const locationPath = location.pathname;
@@ -143,7 +142,8 @@ function ChatPage() {
   //     setMessages((prev) => [...prev, data.user]);
   //   });
 
-  // sockets.on("startTyping", () => {s
+  // sockets.on("startTyping", () => {
+  //   ;
   //   console.log("start typing");
   // });
 
@@ -151,14 +151,14 @@ function ChatPage() {
   //   console.log("stop typing");
   // });
 
-  // sockets.on("previousMessages", (previousMessages) => {
-  //   setMessages(previousMessages);
-  // });
+  //   sockets.on("previousMessages", (previousMessages) => {
+  //     setMessages(previousMessages);
+  //   });
 
-  // return () => {
-  //   sockets.off("message");
-  // sockets.off("startTyping");
-  // sockets.off("stopTyping");
+  //   return () => {
+  //     sockets.off("message");
+  //     sockets.off("startTyping");
+  //     sockets.off("stopTyping");
   //     sockets.off("previousMessages");
   //   };
   // }, []);
@@ -175,11 +175,24 @@ function ChatPage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
-    if (value && socket) {
-      socket.emit("sendMessage", {
-        message: value,
-        receiverId,
-      });
+    if (value && receiverId && socket) {
+      socket.emit(
+        "sendMessage",
+        {
+          text: value,
+          receiverId,
+          senderId: currentUserId,
+          chatRoom,
+        },
+        console.log("message in sendmessage", value),
+        console.log("receiverId in sendmessage", receiverId),
+        console.log("senderId in sendmessage", currentUserId),
+        (response: Response) => {
+          if (response.error) {
+            console.error("the failor by sending message", response.error);
+          }
+        }
+      );
     }
     setValue("");
   };
@@ -225,21 +238,45 @@ function ChatPage() {
       <Box>
         <Box>
           {rooms?.length ? (
+            // <List>
+            //   {rooms.map((room) => (
+            //     <ListItem key={room._id}>
+            //       {receiver && (
+            //         <Box onClick={() => handleUserClick(receiver)}>
+            //           <Avatar
+            //             onClick={() => navigate(`/profile/${receiver._id}`)}
+            //             sx={{ cursor: "pointer" }}
+            //             src={avatarUrl}
+            //           />
+            //           <ListItemText primary={username} />
+            //         </Box>
+            //       )}
+            //     </ListItem>
+            //   ))}
+            // </List>
             <List>
-              {rooms.map((room) => (
-                <ListItem key={room._id}>
-                  {receiver && (
-                    <Box onClick={() => handleUserClick(receiver)}>
+              {rooms.map((room) => {
+                const receiverinRooms: IUser | undefined = room?.users.find(
+                  (user: IUser) => user._id !== currentUserId
+                );
+
+                if (!receiverinRooms) return null; // Если ресивер не найден, пропускаем комнату
+
+                return (
+                  <ListItem key={room._id}>
+                    <Box onClick={() => handleUserClick(receiverinRooms)}>
                       <Avatar
-                        // onClick={() => navigate(`/profile/${receiver._id}`)}
+                        onClick={() =>
+                          navigate(`/profile/${receiverinRooms._id}`)
+                        }
                         sx={{ cursor: "pointer" }}
-                        src={avatarUrl}
+                        src={receiverinRooms.avatarUrl}
                       />
-                      <ListItemText primary={username} />
+                      <ListItemText primary={receiverinRooms.username} />
                     </Box>
-                  )}
-                </ListItem>
-              ))}
+                  </ListItem>
+                );
+              })}
             </List>
           ) : (
             <Typography variant="h6">No rooms</Typography>

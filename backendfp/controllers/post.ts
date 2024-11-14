@@ -112,7 +112,7 @@ export const showAllPosts = async (
       res.status(404).json({ message: "User not found" });
       return;
     }
-    const posts = await Post.find({ user: { $ne: userId } });
+    const posts = await Post.find({ user: { $ne: userId } }).populate("user");
     res.status(201).json({ posts });
     return;
   } catch (error: any) {

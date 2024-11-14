@@ -2,11 +2,13 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "./store";
 import { IUser } from "./userSlice";
+import { IRoom } from "./roomSlice";
 
 export interface IMessage {
   sender: IUser[];
   receiver: IUser[];
   text: string;
+  chatRoom: IRoom;
 }
 
 interface MessageState {
@@ -17,6 +19,7 @@ interface MessageState {
   isError: boolean;
   message: string | null;
   messages: IMessage[] | null;
+  chatRoom: string | null;
 }
 
 const API_URL = "http://localhost:4003/message";
@@ -29,6 +32,7 @@ const initialState: MessageState = {
   receiver: null,
   text: null,
   messages: null,
+  chatRoom: null,
 };
 
 // export const createLike = createAsyncThunk<ILike, { postId: String }>(

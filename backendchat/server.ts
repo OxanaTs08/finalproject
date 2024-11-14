@@ -18,6 +18,15 @@ app.use("/room", roomRouter);
 
 const server = http.createServer(app);
 
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
+});
+
+initializedSocket(io);
+
 mongoose
   .connect(uri!, {})
   .then(() => {
@@ -27,15 +36,6 @@ mongoose
     console.log("Mongoose connection failed:", error);
   });
 
-const io = new Server({
-  cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
-  },
-});
-
-initializedSocket(io);
-
 server.listen(port, () => {
-  console.log(`Сервер запущен на порту ${port}`);
+  console.log(`server runs port ${port}`);
 });

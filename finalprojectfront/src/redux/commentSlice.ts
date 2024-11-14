@@ -5,6 +5,7 @@ import { IUser } from "./userSlice";
 import { IPost } from "./postSlice";
 
 export interface IComment {
+  _id: string;
   post: IPost;
   user: IUser;
   text: string;
@@ -34,9 +35,12 @@ const initialState: CommentState = {
   comment: null,
 };
 
-export const createComment = createAsyncThunk<IComment, { postId: String }>(
-  "post/comment/createcomment",
-  async ({ postId: postId }, { getState, rejectWithValue }) => {
+export const createComment = createAsyncThunk<
+  IComment,
+  { postId: String; text: String }
+>(
+  "comment/createcomment",
+  async ({ postId, text }, { getState, rejectWithValue }) => {
     try {
       const token =
         (getState() as RootState).users.token || localStorage.getItem("token");
@@ -44,8 +48,8 @@ export const createComment = createAsyncThunk<IComment, { postId: String }>(
         return rejectWithValue("Authorization token is missing");
       }
       const response = await axios.post(
-        `${API_URL}/comment/createcomment`,
-        { postId },
+        `${API_URL}/createcomment`,
+        { postId, text },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -54,14 +58,14 @@ export const createComment = createAsyncThunk<IComment, { postId: String }>(
       );
       return response.data.comment;
     } catch (error: any) {
-      return rejectWithValue(error.response.data.message);
+      return rejectWithValue(error.response.data.message || error.message);
     }
   }
 );
 
 export const showAllComments = createAsyncThunk(
   "comment/showallcomment",
-  async (id: string, { getState, rejectWithValue }) => {
+  async (postId: string, { getState, rejectWithValue }) => {
     try {
       const token =
         (getState() as RootState).users.token || localStorage.getItem("token");
@@ -70,7 +74,7 @@ export const showAllComments = createAsyncThunk(
       }
       const response = await axios.post(
         `${API_URL}/showallcomment`,
-        { id },
+        { postId },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -106,6 +110,22 @@ export const commentSlice = createSlice({
         }
       )
       .addCase(createComment.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      })
+      .addCase(showAllComments.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(
+        showAllComments.fulfilled,
+        (state, action: PayloadAction<IComment[]>) => {
+          state.isLoading = false;
+          state.comments = action.payload;
+        }
+      )
+      .addCase(showAllComments.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload as string;

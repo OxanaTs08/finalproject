@@ -44,13 +44,14 @@ const Notifications = () => {
                 </>
               )}
               <ListItemText primary={notification.type} />
-              {notification.post && (
-                <Avatar
-                  onClick={() => navigate(`/post/${notification.post?._id}`)}
-                  sx={{ cursor: "pointer" }}
-                  src={notification.post?.images[0]}
-                />
-              )}
+              {notification.post?.images &&
+                notification.post.images.length > 0 && (
+                  <Avatar
+                    onClick={() => navigate(`/post/${notification.post?._id}`)}
+                    sx={{ cursor: "pointer" }}
+                    src={notification.post?.images[0]}
+                  />
+                )}
             </ListItem>
           ))}
         </List>

@@ -34,6 +34,7 @@ const AppRouter = () => {
           <Route path="/explore" element={<ExplorePage />} />
           <Route path="/updateprofile" element={<EditProfile />} />
           <Route path="/chatpage" element={<ChatPage />} />
+          <Route path="/chatpage/:receiverId" element={<ChatPage />} />
         </Route>
         {/* </Route> */}
       </Routes>

@@ -105,6 +105,13 @@ const PostCard = ({ post }: { post: IPost }) => {
         // console.log("followingId in creating", userId);
         await dispatch(createFollowing({ followingId: userId }));
         setIsFollowing((prev) => !prev);
+        await dispatch(
+          createNotification({
+            post: post,
+            user: post.user,
+            type: "follow",
+          })
+        );
       }
     } catch (error) {
       console.error(error);
