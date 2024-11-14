@@ -146,40 +146,75 @@ const PostPage = () => {
 
   return (
     <>
-      <Card>
+      <Card
+        sx={{ maxWidth: 900, m: "auto", p: 2, borderRadius: 2, boxShadow: 3 }}
+      >
         <Box sx={{ display: "flex", flexDirection: "row" }}>
           <Box sx={{ width: "50%" }}>
             <CardMedia
               component="img"
               height="194"
-              image={post?.images.join(", ")}
+              // image={post?.images.join(", ")}
+              image={post?.images[0]}
               alt="post"
+              sx={{ width: "50%", borderRadius: 2 }}
             />
           </Box>
-          <Stack sx={{ width: "50%" }}>
-            <Paper sx={{ display: "flex", flexDirection: "row" }}>
+          <Stack spacing={2} sx={{ width: "50%", p: 2 }}>
+            <Paper
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                p: 1,
+                flexDirection: "row",
+              }}
+            >
               <Avatar src={user?.avatarUrl}></Avatar>
-              <IconButton aria-label="settings" onClick={handleSettings}>
+              <Typography variant="h6" sx={{ ml: 1 }}>
+                {user?.username}
+              </Typography>
+              <IconButton
+                aria-label="settings"
+                onClick={handleSettings}
+                sx={{ ml: "auto" }}
+              >
                 <MoreVertIcon />
               </IconButton>
             </Paper>
             <Paper>
               <Avatar src={user?.avatarUrl} />
-              <Typography>{user?.username}</Typography>
-              <Typography>{post?.content}</Typography>
-              <Stack>
+              <Typography variant="h6" sx={{ ml: 1 }}>
+                {user?.username}
+              </Typography>
+              <Typography variant="body1" sx={{ mt: 1 }}>
+                {post?.content}
+              </Typography>
+              <Stack spacing={1}>
                 {comments &&
                   comments.map((comment) => (
-                    <Box key={comment._id}>
-                      <Avatar src={commentUserAvatar} />
-                      <Typography>{commentUserName}</Typography>
-                      <Typography>{comment?.text}</Typography>
+                    <Box
+                      key={comment._id}
+                      sx={{ display: "flex", alignItems: "center" }}
+                    >
+                      <Avatar
+                        src={commentUserAvatar}
+                        sx={{ width: 30, height: 30 }}
+                      />
+                      <Typography
+                        variant="body2"
+                        sx={{ ml: 1, fontWeight: 500 }}
+                      >
+                        {commentUserName}
+                      </Typography>
+                      <Typography variant="body2" sx={{ ml: 1 }}>
+                        {comment?.text}
+                      </Typography>
                     </Box>
                   ))}
               </Stack>
             </Paper>
             <Stack>
-              <Box>
+              <Box sx={{ alignItems: "center" }}>
                 <IconButton aria-label="like" onClick={handleToggleLike}>
                   <FavoriteIcon sx={{ color: isLiked ? "red" : "default" }} />
                 </IconButton>

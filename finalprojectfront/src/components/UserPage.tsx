@@ -5,7 +5,15 @@ import { IUser, userById, createFollowing } from "../redux/userSlice";
 import { IPost, postsByAnotherUser } from "../redux/postSlice";
 import { createRoom } from "../redux/roomSlice";
 import { useEffect, useState } from "react";
-import { Box, Typography, Stack, Grid, CardMedia, styled } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Stack,
+  Grid,
+  CardMedia,
+  styled,
+  Avatar,
+} from "@mui/material";
 import MainButton from "./MainButton";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
@@ -110,14 +118,31 @@ const UserPage = () => {
 
   return (
     <>
-      <Stack sx={{ gap: "16px" }}>
+      <Stack sx={{ gap: "20px" }}>
         {user && (
-          <Box sx={{ display: "flex", flexDirection: "row", gap: "16px" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              gap: "20px",
+              alignItems: "center",
+            }}
+          >
             {" "}
-            <Box>photo</Box>
-            <Stack>
-              <Box sx={{ display: "flex", flexDirection: "row" }}>
-                <Typography>{user.username}</Typography>
+            <Avatar
+              sx={{ width: "100px", height: "120px" }}
+              src={user?.avatarUrl}
+            ></Avatar>
+            <Stack sx={{ flex: 1 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
+                <Typography variant="h5">{user.username}</Typography>
                 {/* <MainButton
                   buttonText="Edit Profile"
                   onClick={() => {
@@ -135,26 +160,48 @@ const UserPage = () => {
                   }}
                 />
               </Box>
-              <Box sx={{ display: "flex", flexDirection: "row" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "20px",
+                  mt: 1,
+                }}
+              >
                 <Typography>{user?.posts?.length} posts</Typography>
                 <Typography>{user?.followings?.length} followings</Typography>
                 <Typography>{user?.followers?.length} followers</Typography>
               </Box>
-              <Box>description</Box>
+              <Typography variant="body1" sx={{ mt: 1 }}>
+                {user.description}
+              </Typography>
             </Stack>
           </Box>
         )}
 
-        <Grid container spacing={2} justifyContent="center">
+        <Grid
+          container
+          spacing={2}
+          justifyContent="center"
+          sx={{ marginTop: 3 }}
+        >
           {posts.length > 0 ? (
             posts.map((post: IPost) => (
-              <Grid item xs={12} sm={6} md={3} key={post._id}>
+              <Grid item xs={12} sm={6} md={4} key={post._id}>
                 <StyledNavLink to={`/post/${post._id}`}>
                   <CardMedia
                     component="img"
                     height="194"
-                    image={post.images.join(", ")}
+                    // image={post.images.join(", ")}
+                    image={post.images[0]}
                     alt="post"
+                    sx={{
+                      borderRadius: "8px",
+                      transition: "transform 0.3s",
+                      "&:hover": {
+                        transform: "scale(1.05)",
+                      },
+                    }}
                   />
                 </StyledNavLink>
               </Grid>
@@ -162,7 +209,7 @@ const UserPage = () => {
           ) : (
             <Typography
               variant="h6"
-              sx={{ textAlign: "center", width: "100%" }}
+              sx={{ textAlign: "center", width: "100%", mt: 4 }}
             >
               There are no posts
             </Typography>

@@ -105,78 +105,89 @@ const LogInPage = () => {
           sx={{
             alignItems: "center",
             border: "1px solid #DBDBDB",
+            padding: "40px",
+            width: "350px",
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
           }}
         >
-          <Stack sx={{ padding: "40px 30px 40px 23px" }}>
+          <Box sx={{ marginBottom: "24px" }}>
             <img src={Logo} alt="Logo" />
+          </Box>
 
-            <form onSubmit={handleSubmit}>
-              <Stack
-                sx={{
-                  gap: "16px",
-                  alignItems: "center",
+          <form onSubmit={handleSubmit}>
+            <Stack
+              sx={{
+                gap: "6px",
+                alignItems: "center",
+              }}
+            >
+              <StyledTextField
+                label="Username"
+                fullWidth
+                margin="normal"
+                type="text"
+                value={username}
+                inputProps={{
+                  pattern: "[A-Za-z ]+",
                 }}
-              >
-                <StyledTextField
-                  label="Username"
-                  fullWidth
-                  margin="normal"
-                  type="text"
-                  value={username}
-                  inputProps={{
-                    pattern: "[A-Za-z ]+",
-                  }}
-                  error={usernameError}
-                  helperText={
-                    usernameError ? "Your name must contain only letters" : ""
-                  }
-                  onChange={handleNameChange}
-                />
-                <StyledTextField
-                  label="Password"
-                  fullWidth
-                  margin="normal"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                error={usernameError}
+                helperText={
+                  usernameError ? "Your name must contain only letters" : ""
+                }
+                onChange={handleNameChange}
+              />
+              <StyledTextField
+                label="Password"
+                fullWidth
+                margin="normal"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
 
-                <MainButton
-                  buttonText={isLoading ? "Loading..." : "LogIn"}
-                  type="submit"
-                  sx={{ width: "100%" }}
-                  disabled={isLoading}
-                />
-              </Stack>
-            </form>
-            {isError && (
-              <Typography color="error" sx={{ textAlign: "center" }}>
-                {errorMessage}
-              </Typography>
-            )}
-            <Divider>
-              {" "}
-              <Typography color="#737373">OR</Typography>{" "}
-            </Divider>
-            <StyledNavLink to="/forgotpassword">
-              {" "}
-              <Typography color="#00376B" sx={{ textAlign: "center" }}>
-                Forgot password
-              </Typography>{" "}
-            </StyledNavLink>
+              <MainButton
+                buttonText={isLoading ? "Loading..." : "LogIn"}
+                type="submit"
+                sx={{ width: "100%" }}
+                disabled={isLoading}
+              />
+            </Stack>
+          </form>
+          {isError && (
+            <Typography color="error" sx={{ textAlign: "center" }}>
+              {errorMessage}
+            </Typography>
+          )}
+          <Divider sx={{ margin: "20px 0 20px 0", width: "100%" }}>
+            {" "}
+            <Typography color="#737373">OR</Typography>{" "}
+          </Divider>
+          <StyledNavLink to="/forgotpassword">
+            {" "}
+            <Typography color="#00376B" sx={{ textAlign: "center" }}>
+              Forgot password
+            </Typography>{" "}
+          </StyledNavLink>
 
-            {isError && <Typography>{message}</Typography>}
-          </Stack>
+          {isError && <Typography>{message}</Typography>}
         </Stack>
         <Box
           sx={{
+            display: "flex",
             alignItems: "center",
             border: "1px solid #DBDBDB",
             flexDirection: "row",
+            justifyContent: "center",
+            padding: "20px",
+            marginTop: "10px",
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
           }}
         >
-          <Typography color="#000000" sx={{ textAlign: "center" }}>
-            Don't have an account
+          <Typography
+            color="#000000"
+            sx={{ textAlign: "center", marginRight: "5px" }}
+          >
+            Don't have an account?
           </Typography>{" "}
           <StyledNavLink to="/register">
             {" "}

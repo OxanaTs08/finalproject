@@ -60,35 +60,53 @@ const ResetPasswordPage = () => {
   };
 
   return (
-    <Stack>
+    <Stack
+      alignItems="center"
+      justifyContent="center"
+      spacing={2}
+      sx={{
+        mt: 4,
+      }}
+    >
       <Stack
+        spacing={2}
         sx={{
+          width: "300px",
           alignItems: "center",
           border: "1px solid #DBDBDB",
-          padding: "40px 30px 40px 23px",
+          padding: "40px",
+          textAlign: "center",
+          borderRadius: "8px",
         }}
       >
-        <Stack sx={{ padding: "40px 30px 40px 23px", gap: "10px" }}>
+        <Stack
+          sx={{
+            padding: "40px 30px 40px 23px",
+            gap: "10px",
+            alignItems: "center",
+          }}
+        >
           <img
             src={Lock}
             alt="lock"
             style={{ width: "96px", height: "96px" }}
           />
-          <Typography sx={{ textAlign: "center", fontWeight: "bold" }}>
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            sx={{ textAlign: "center" }}
+          >
             Trouble logging in?
           </Typography>
-          <Typography sx={{ textAlign: "center", color: "#737373" }}>
+          <Typography
+            sx={{ textAlign: "center", color: "#737373", fontSize: "14px" }}
+          >
             Enter your email, phone, or username and we'll send you a link to
             get back into your account.
           </Typography>
 
           <form onSubmit={handleSubmit}>
-            <Stack
-              sx={{
-                gap: "16px",
-                alignItems: "center",
-              }}
-            >
+            <Stack spacing={2} alignItems="center">
               <StyledTextField
                 label="Username"
                 fullWidth
@@ -108,39 +126,47 @@ const ResetPasswordPage = () => {
               <MainButton
                 buttonText={"Reset Your Password"}
                 type="submit"
-                sx={{ width: "100%" }}
+                sx={{ width: "100%", fontSize: "14px" }}
                 disabled={isLoading}
               />
             </Stack>
           </form>
-          <Divider>
+          <Divider sx={{ width: "100%", my: 2 }}>
             {" "}
-            <Typography color="#737373">OR</Typography>{" "}
+            <Typography color="#737373" fontSize="14px">
+              OR
+            </Typography>{" "}
           </Divider>
           <StyledNavLink to="/">
             {" "}
-            <Typography color="#00376B" sx={{ textAlign: "center" }}>
+            <Typography
+              color="#00376B"
+              sx={{ textAlign: "center", fontSize: "14px", fontWeight: "bold" }}
+            >
               Create New Account
             </Typography>{" "}
           </StyledNavLink>
 
           {isError && <Typography>{message}</Typography>}
         </Stack>
+        <Box
+          sx={{
+            textAlign: "center",
+            mt: 2,
+            // alignItems: "center",
+            border: "1px solid #DBDBDB",
+            // flexDirection: "row",
+            width: "100%",
+          }}
+        >
+          <StyledNavLink to="/">
+            {" "}
+            <Typography color="#0095F6" sx={{ textAlign: "center" }}>
+              Back to Log In
+            </Typography>{" "}
+          </StyledNavLink>
+        </Box>
       </Stack>
-      <Box
-        sx={{
-          alignItems: "center",
-          border: "1px solid #DBDBDB",
-          flexDirection: "row",
-        }}
-      >
-        <StyledNavLink to="/">
-          {" "}
-          <Typography color="#0095F6" sx={{ textAlign: "center" }}>
-            Back to LogIn
-          </Typography>{" "}
-        </StyledNavLink>
-      </Box>
     </Stack>
   );
 };

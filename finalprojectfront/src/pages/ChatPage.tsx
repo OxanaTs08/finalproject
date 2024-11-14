@@ -98,6 +98,7 @@ function ChatPage() {
       newSocket.on("message", ({ data }) =>
         setMessages((prev) => [...prev, data])
       );
+
       newSocket.on("previousMessages", (previousMessages) =>
         setMessages(previousMessages)
       );
@@ -184,9 +185,7 @@ function ChatPage() {
           senderId: currentUserId,
           chatRoom,
         },
-        console.log("message in sendmessage", value),
-        console.log("receiverId in sendmessage", receiverId),
-        console.log("senderId in sendmessage", currentUserId),
+
         (response: Response) => {
           if (response.error) {
             console.error("the failor by sending message", response.error);

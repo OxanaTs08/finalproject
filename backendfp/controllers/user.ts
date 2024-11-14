@@ -312,12 +312,12 @@ export const toFollow = async (req: CustomRequest, res: Response) => {
       return;
     } else {
       await User.findByIdAndUpdate(userId, {
-        $push: {
+        $addToSet: {
           followings: following._id,
         },
       });
       await User.findByIdAndUpdate(followingId, {
-        $push: { followers: user._id },
+        $addToSet: { followers: user._id },
       });
       const updatedUser = await User.findById(userId).populate("followings");
 

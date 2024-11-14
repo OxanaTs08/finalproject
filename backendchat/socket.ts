@@ -11,19 +11,14 @@ const connectedUsers: Set<string> = new Set();
 export const initializedSocket = (io: Server) => {
   io.on("connection", (socket) => {
     console.log("A user connected:", socket.id);
+    console.log("Connected users:", connectedUsers);
 
     let currentUserId: string | null = null;
     let chatRoom: string | null = null;
 
     socket.on(
       "join",
-      async ({
-        username,
-        senderId,
-      }: {
-        username: string;
-        senderId: string;
-      }) => {
+      ({ username, senderId }: { username: string; senderId: string }) => {
         currentUserId = senderId;
         socket.join(currentUserId);
         console.log("Current user ID in join in app:", currentUserId);
@@ -82,6 +77,10 @@ export const initializedSocket = (io: Server) => {
             senderId: string;
             chatRoom: string;
           }) => {
+            console.log("mesage from front", message);
+            console.log("receiverId from front", receiverId);
+            console.log("chatroom from front", chatRoom);
+            console.log("sender from front", senderId);
             if (!chatRoom || !currentUserId) {
               console.log("user is not in a chat room");
               return;

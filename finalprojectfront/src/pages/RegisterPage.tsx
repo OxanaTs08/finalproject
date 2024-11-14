@@ -91,12 +91,21 @@ const RegisterPage: React.FC = () => {
   }, [open, navigate]);
 
   return (
-    <>
+    <Box
+      sx={{
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "100vh",
+        padding: "40px 0",
+      }}
+    >
       <Stack
         sx={{
           gap: "10px",
           margin: "0 auto",
           justifyContent: "center",
+          maxWidth: "350px",
+          width: "100%",
           alignItems: "center",
         }}
       >
@@ -108,19 +117,25 @@ const RegisterPage: React.FC = () => {
           }}
         >
           <Stack sx={{ padding: "40px 30px 40px 23px" }}>
-            <img src={Logo} alt="Logo" />
+            <Box sx={{ maginBottom: "20px" }}>
+              <img src={Logo} alt="Logo" />
+            </Box>
 
-            <Typography color="#737373">
+            <Typography
+              color="#737373"
+              variant="body2"
+              textAlign="center"
+              sx={{ mb: 2 }}
+            >
               Sign Up To See Photos and Videos of your Friends
             </Typography>
 
             <form onSubmit={handleSubmit}>
-              <Box
+              <Stack
+                spacing={2}
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "16px",
                   alignItems: "center",
+                  width: "100%",
                 }}
               >
                 <StyledTextField
@@ -155,36 +170,35 @@ const RegisterPage: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <Stack>
-                  <Typography color="#737373">
-                    People who use our service may have uploaded
+                  <Typography
+                    color="#737373"
+                    variant="caption"
+                    textAlign="center"
+                    sx={{ mt: 1 }}
+                  >
+                    People who use our service may have uploaded your contact
+                    information to Instagram.
+                    <StyledNavLink to="/#">Learn More</StyledNavLink>
                   </Typography>
-                  <Typography color="#737373">
-                    your contact information to Instagram.
-                    <StyledNavLink to="/#">
-                      <Typography color="#00376B">Learn More</Typography>
-                    </StyledNavLink>
-                  </Typography>
-                  <Typography color="#737373">
+                  <Typography
+                    color="#737373"
+                    variant="caption"
+                    textAlign="center"
+                    sx={{ mt: 1 }}
+                  >
                     By signing up, you agree to our
-                    <StyledNavLink to="/#">
-                      <Typography color="#00376B">Terms</Typography>
-                    </StyledNavLink>
-                    ,
-                    <StyledNavLink to="/#">
-                      <Typography color="#00376B">Privacy Policy</Typography>
-                    </StyledNavLink>
-                    and
-                    <StyledNavLink to="/#">
-                      <Typography color="#00376B">Cookies Policy</Typography>
-                    </StyledNavLink>
+                    <StyledNavLink to="/#">Terms</StyledNavLink>,
+                    <StyledNavLink to="/#">Privacy Policy</StyledNavLink>
+                    and{""}
+                    <StyledNavLink to="/#">Cookies Policy</StyledNavLink>
                   </Typography>
+                  <MainButton
+                    buttonText="Sign Up"
+                    type="submit"
+                    sx={{ width: "100%", mt: 2 }}
+                  />
                 </Stack>
-                <MainButton
-                  buttonText="Sign Up"
-                  type="submit"
-                  sx={{ width: "100%" }}
-                />
-              </Box>
+              </Stack>
               {errorMessage && (
                 <Typography color="error" sx={{ mt: 2 }}>
                   {errorMessage}
@@ -207,24 +221,28 @@ const RegisterPage: React.FC = () => {
         </Stack>
         <Box
           sx={{
+            display: "flex",
+            justifyContent: "center",
             alignItems: "center",
             border: "1px solid #DBDBDB",
             flexDirection: "row",
-            padding: "40px",
+            padding: "20px",
+            width: "100%",
+            gap: "10px",
           }}
         >
           <Typography color="#000000" sx={{ textAlign: "center" }}>
-            Have an account
-          </Typography>{" "}
+            Have an account{" "}
+          </Typography>
           <StyledNavLink to="/">
             {" "}
             <Typography color="#0095F6" sx={{ textAlign: "center" }}>
-              Sign In
+              Log In
             </Typography>{" "}
           </StyledNavLink>
         </Box>
       </Stack>
-    </>
+    </Box>
   );
 };
 

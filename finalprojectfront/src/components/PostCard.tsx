@@ -24,6 +24,7 @@ import { createFollowing } from "../redux/userSlice";
 import MainButton from "./MainButton";
 import { createNotification } from "../redux/notificationSlice";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import { showPostsByFollowings } from "../redux/postSlice";
 
 const StyledNavLink = styled(NavLink)(() => ({
   color: "rgba(40, 40, 40, 1)",
@@ -113,6 +114,7 @@ const PostCard = ({ post }: { post: IPost }) => {
           })
         );
       }
+      await dispatch(showPostsByFollowings());
     } catch (error) {
       console.error(error);
     }
@@ -133,10 +135,7 @@ const PostCard = ({ post }: { post: IPost }) => {
             })}
           />
         </StyledNavLink>
-        <MainButton
-          buttonText={isFollowing ? "Unfollow" : "Follow"}
-          onClick={handleToggleFollow}
-        />
+        <MainButton buttonText={"Follow"} onClick={handleToggleFollow} />
         <StyledNavLink to={`/post/${post._id}`}>
           <CardMedia
             component="img"

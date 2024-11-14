@@ -24,6 +24,7 @@ import { resetState } from "../redux/userSlice";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import Notifications from "../components/Notifications";
 import Search from "./ Search";
+import Logo from "../assets/ICHGRALOGO 2.png";
 
 export const headerWidth = 245;
 
@@ -103,6 +104,7 @@ const Header = () => {
       >
         <Toolbar>
           <List>
+            <img src={Logo} alt="Logo" />
             {menu.map((menuItem, index) => (
               <ListItem key={index} disablePadding>
                 <ListItemButton
