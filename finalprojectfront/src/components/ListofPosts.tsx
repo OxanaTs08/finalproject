@@ -36,14 +36,15 @@ const ListofPosts = () => {
       sx={{
         display: "flex",
         flexDirection: "column",
+        alignItems: "center",
         gap: "40px",
         paddingTop: "40px",
       }}
     >
-      <Grid container spacing={2} justifyContent="center">
+      <Grid container spacing={0} justifyContent="center">
         {posts &&
           posts.map((post: IPost) => (
-            <Grid item xs={12} sm={6} md={3} key={post._id}>
+            <Grid item xs={12} sm={6} key={post._id}>
               <PostCard post={post} />
             </Grid>
           ))}

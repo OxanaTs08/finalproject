@@ -1,13 +1,14 @@
 import {
   Typography,
   styled,
-  Card,
-  CardHeader,
   Avatar,
   IconButton,
   CardMedia,
   CardContent,
   CardActions,
+  Stack,
+  Box,
+  Button,
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import { useAppDispatch } from "../hooks/useAppDispatch";
@@ -15,8 +16,9 @@ import { RootState } from "../redux/store";
 import { IPost } from "../redux/postSlice";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import LikeIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import CommentIcon from "@mui/icons-material/ModeCommentOutlined";
+import CommentIcon from "../assets/comment.png";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import { createLike } from "../redux/likeSlice";
@@ -25,6 +27,7 @@ import MainButton from "./MainButton";
 import { createNotification } from "../redux/notificationSlice";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import { showPostsByFollowings } from "../redux/postSlice";
+import dot from "../assets/•.png";
 
 const StyledNavLink = styled(NavLink)(() => ({
   color: "rgba(40, 40, 40, 1)",
@@ -121,62 +124,99 @@ const PostCard = ({ post }: { post: IPost }) => {
   };
   return (
     <>
-      <Card sx={{ maxWidth: 345 }}>
-        <StyledNavLink to={`/profile/${user._id}`}>
-          <CardHeader
-            avatar={
-              <Avatar aria-label="recipe" src={profilePicture}>
-                {!profilePicture && <PersonOutlineOutlinedIcon />}
-              </Avatar>
-            }
-            title={username}
-            subheader={formatDistanceToNow(new Date(post.createdAt), {
+      <Stack
+        sx={{
+          maxWidth: 345,
+          borderRadius: 1,
+          gap: "10px",
+          borderBottom: "1px solid #EFEFEF",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
+          <StyledNavLink to={`/profile/${user._id}`}>
+            <Avatar src={profilePicture} />
+            {/* {!profilePicture && <PersonOutlineOutlinedIcon />} */}
+          </StyledNavLink>
+          <Typography sx={{ fontWeight: "bold" }}>{username}</Typography>
+          <img src={dot} alt="" style={{ color: "#737373" }} />
+          <Typography sx={{ color: "#737373", fontSize: "12px" }}>
+            {formatDistanceToNow(new Date(post.createdAt), {
               addSuffix: true,
             })}
-          />
-        </StyledNavLink>
-        <MainButton buttonText={"Follow"} onClick={handleToggleFollow} />
+          </Typography>
+          <img src={dot} alt="" style={{ color: "#737373" }} />
+          <Button
+            sx={{ textTransform: "none", fontWeight: "bold" }}
+            onClick={handleToggleFollow}
+          >
+            Follow
+          </Button>
+        </Box>
+
         <StyledNavLink to={`/post/${post._id}`}>
           <CardMedia
             component="img"
-            height="194"
-            image={post.images.join(", ")}
+            // height="194"
+            image={post.images[0]} //carousel
             alt="post"
+            sx={{ aspectRatio: "1/1", objectFit: "cover" }}
           />
         </StyledNavLink>
-        <CardActions disableSpacing>
+        <StyledNavLink to={`/post/${post._id}`}>
+          <Typography
+            variant="body2"
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              display: "-webkit-box",
+              WebkitLineClamp: 1,
+              WebkitBoxOrient: "vertical",
+              marginBottom: 2,
+            }}
+          >
+            {post.content}
+          </Typography>
+        </StyledNavLink>
+
+        <Box sx={{ display: "flex", gap: "10px", alignItems: "left" }}>
           <IconButton aria-label="like" onClick={handleToggleLike}>
-            <FavoriteIcon sx={{ color: isLiked ? "red" : "default" }} />
+            {isLiked ? (
+              <FavoriteIcon sx={{ color: "red" }} />
+            ) : (
+              <LikeIcon sx={{ color: "black" }} />
+            )}
           </IconButton>
           <IconButton aria-label="comment">
-            <CommentIcon />
+            <img src={CommentIcon} alt="" />
           </IconButton>
-        </CardActions>
+        </Box>
 
         <CardContent>
-          <Typography>{likesCount} Likes</Typography>
-
-          <Typography>
-            {" "}
-            Show All Comments ({post?.comments?.length}){" "}
+          <Typography sx={{ fontWeight: "bold" }}>
+            {likesCount} likes
           </Typography>
-          <StyledNavLink to={`/posts/${post._id}`}>
-            <Typography
-              variant="body2"
-              sx={{
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-                display: "-webkit-box",
-                WebkitLineClamp: 1,
-                WebkitBoxOrient: "vertical",
-              }}
-            >
-              {post.content}
-            </Typography>
-          </StyledNavLink>
+          <Typography
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              WebkitLineClamp: 1,
+              WebkitBoxOrient: "vertical",
+              display: "-webkit-box",
+              color: "grey",
+            }}
+          >
+            View All Comments ({post?.comments?.length}){" "}
+          </Typography>
         </CardContent>
-      </Card>
+      </Stack>
     </>
   );
 };

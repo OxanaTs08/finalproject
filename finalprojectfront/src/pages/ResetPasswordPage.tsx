@@ -74,7 +74,6 @@ const ResetPasswordPage = () => {
           width: "300px",
           alignItems: "center",
           border: "1px solid #DBDBDB",
-          padding: "40px",
           textAlign: "center",
           borderRadius: "8px",
         }}
@@ -140,7 +139,6 @@ const ResetPasswordPage = () => {
           <StyledNavLink to="/">
             {" "}
             <Typography
-              color="#00376B"
               sx={{ textAlign: "center", fontSize: "14px", fontWeight: "bold" }}
             >
               Create New Account
@@ -155,13 +153,18 @@ const ResetPasswordPage = () => {
             mt: 2,
             // alignItems: "center",
             border: "1px solid #DBDBDB",
+            borderRadius: "8px",
             // flexDirection: "row",
             width: "100%",
+            padding: "10px 0 10px 0",
+            backgroundColor: "#FAFAFA",
           }}
         >
           <StyledNavLink to="/">
             {" "}
-            <Typography color="#0095F6" sx={{ textAlign: "center" }}>
+            <Typography
+              sx={{ textAlign: "center", fontSize: "14px", fontWeight: "bold" }}
+            >
               Back to Log In
             </Typography>{" "}
           </StyledNavLink>
