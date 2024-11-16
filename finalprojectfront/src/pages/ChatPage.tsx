@@ -19,7 +19,7 @@ import { useAppDispatch } from "../hooks/useAppDispatch";
 import { RootState } from "../redux/store";
 import { IUser } from "../redux/userSlice";
 import { IRoom, showRooms } from "../redux/roomSlice";
-import { IMessage } from "../redux/messageSlice";
+// import { IMessage } from "../redux/messageSlice";
 
 interface Response {
   error?: string;
@@ -30,6 +30,14 @@ const sockets = io("http://localhost:4003");
 //   const sockets = io.connect("http://localhost:4003");
 // }
 // setSocket(newSocket);
+
+interface IMessage {
+  text: string;
+  user: {
+    username: string;
+    avatarUrl: string;
+  };
+}
 
 function ChatPage() {
   const dispatch = useAppDispatch();
@@ -58,16 +66,15 @@ function ChatPage() {
   const receiver: IUser | undefined = room?.users.find(
     (user: IUser) => user._id !== currentUserId
   );
-
-  const username = receiver?.username;
-  const avatarUrl = receiver?.avatarUrl;
+  console.log("receiver in chat page after find", receiver);
   // const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
     if (currentUserId && receiverId) {
       console.log("Connected to the server", currentUserId, receiverId);
       sockets.emit("join", {
-        username: receiverId,
+        username: username,
+        avatarUrl: avatarUrl,
         senderId: currentUserId,
       });
       sockets.emit("getPreviousMessages", {
@@ -82,10 +89,25 @@ function ChatPage() {
   }, [currentUserId, receiverId]);
 
   useEffect(() => {
-    sockets.on("message", (message: IMessage) => {
-      console.log("Message received:", message);
-      setMessages((prev) => [...prev, message]);
+    // sockets.on("message", (message: IMessage) => {
+    //   console.log("Message received:", message);
+    //   setMessages((prev) => [...prev, message]);
+    // });
+
+    sockets.on("message", ({ data }) => {
+      console.log("Message received:", data);
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: data.user.message,
+          user: {
+            username: data.user.username || "unknown",
+            avatarUrl: data.user.avatarUrl || "",
+          },
+        },
+      ]);
     });
+
     sockets.on("previousMessages", (previousMessages: IMessage[]) => {
       console.log("Previous messages received:", previousMessages);
 
@@ -108,11 +130,23 @@ function ChatPage() {
     }
   };
 
+  const avatarUrl = useSelector(
+    (state: RootState) => state.users.currentUser?.avatarUrl
+  );
+  console.log("avatarUrl in chat page", avatarUrl);
+  const username = useSelector(
+    (state: RootState) => state.users.currentUser?.username
+  );
+  console.log("username in chat page", username);
+
   const handleSubmit = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
     if (value) {
       sockets.emit("sendMessage", {
         message: value,
+        //new added
+        username,
+        avatarUrl,
         receiverId,
       });
     }
@@ -260,12 +294,16 @@ function ChatPage() {
               gap: 2,
             }}
           >
-            {messages.map(({ text }, i) => (
+            {messages.map((message, i) => (
               <Box key={i}>
-                {/* <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                  {receiver.username}
-                </Typography> */}
-                <Typography variant="body1">{text}</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                  {message.user?.username || "unknown"}
+                </Typography>
+                <Avatar
+                  sx={{ cursor: "pointer" }}
+                  src={message.user?.avatarUrl || ""}
+                />
+                <Typography variant="body1">{message.text}</Typography>
               </Box>
             ))}
           </Card>

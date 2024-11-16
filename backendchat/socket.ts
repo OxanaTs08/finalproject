@@ -18,9 +18,11 @@ export const initializedSocket = (io: Server) => {
       "join",
       async ({
         username,
+        avatarUrl,
         senderId,
       }: {
         username: string;
+        avatarUrl: string;
         senderId: string;
       }) => {
         if (!senderId) {
@@ -31,6 +33,7 @@ export const initializedSocket = (io: Server) => {
         socket.join(currentUserId);
         console.log("Current user ID in join in app:", currentUserId);
         console.log("Current username in join in app:", username);
+        console.log("Current avvatarUrl in join in app:", avatarUrl);
       }
     );
 
@@ -71,8 +74,9 @@ export const initializedSocket = (io: Server) => {
 
       const previousMessages = await Message.find({ room: chatRoom }).populate(
         "sender",
-        "username"
+        "username avatarUrl"
       );
+      // console.log("Previous messages:", previousMessages);//отрабатывает
       socket.emit("previousMessages", previousMessages);
 
       socket.on("sendMessage", async ({ message }) => {
@@ -84,6 +88,9 @@ export const initializedSocket = (io: Server) => {
           console.error("message text is missing");
           return;
         }
+
+        const user = await User.findById(currentUserId);
+
         const newMessage = new Message({
           room: chatRoom,
           sender: currentUserId,
@@ -96,9 +103,26 @@ export const initializedSocket = (io: Server) => {
           $push: { messages: newMessage._id },
         });
 
+        // io.to(chatRoom).emit("message", {
+        //   text: message,
+        //   sender: currentUserId,
+        // });
+
+        console.log("Sending message:", {
+          user: {
+            username: user?.username,
+            avatarUrl: user?.avatarUrl,
+            message: message,
+          },
+        });
         io.to(chatRoom).emit("message", {
-          text: message,
-          sender: currentUserId,
+          data: {
+            user: {
+              username: user?.username,
+              avatarUrl: user?.avatarUrl,
+              message: message,
+            },
+          },
         });
       });
 
@@ -121,6 +145,7 @@ async function handleUserLeave(io: Server, currentUserId: string) {
       data: {
         user: {
           username: user.username,
+          avatarUrl: user.avatarUrl,
           message: `${user.username} has left the chat`,
         },
       },
