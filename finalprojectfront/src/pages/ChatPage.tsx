@@ -7,11 +7,11 @@ import {
   Typography,
   TextField,
   Stack,
-  Card,
   ListItem,
   List,
   Avatar,
   ListItemText,
+  Button,
 } from "@mui/material";
 import MainButton from "../components/MainButton";
 import { useSelector } from "react-redux";
@@ -25,11 +25,6 @@ interface Response {
   error?: string;
 }
 const sockets = io("http://localhost:4003");
-
-// if (location.pathname.includes("/chatpage")) {
-//   const sockets = io.connect("http://localhost:4003");
-// }
-// setSocket(newSocket);
 
 interface IMessage {
   text: string;
@@ -62,7 +57,7 @@ function ChatPage() {
   const rooms: IRoom[] | null = useSelector(
     (state: RootState) => state.rooms.rooms || []
   );
-  const room: IRoom | null = rooms.length > 0 ? rooms[0] : null;
+  const room: IRoom | null = rooms?.length > 0 ? rooms[0] : null;
   const receiver: IUser | undefined = room?.users.find(
     (user: IUser) => user._id !== currentUserId
   );
@@ -78,7 +73,6 @@ function ChatPage() {
         senderId: currentUserId,
       });
       sockets.emit("getPreviousMessages", {
-        //а не должен ли быть тут on
         sender: currentUserId,
         receiver: receiverId,
       });
@@ -89,11 +83,6 @@ function ChatPage() {
   }, [currentUserId, receiverId]);
 
   useEffect(() => {
-    // sockets.on("message", (message: IMessage) => {
-    //   console.log("Message received:", message);
-    //   setMessages((prev) => [...prev, message]);
-    // });
-
     sockets.on("message", ({ data }) => {
       console.log("Message received:", data);
       setMessages((prev) => [
@@ -126,7 +115,7 @@ function ChatPage() {
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === "Enter") {
-      handleSubmit(e);
+      handleSubmit();
     }
   };
 
@@ -139,8 +128,7 @@ function ChatPage() {
   );
   console.log("username in chat page", username);
 
-  const handleSubmit = (e: React.FormEvent<HTMLElement>) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     if (value) {
       sockets.emit("sendMessage", {
         message: value,
@@ -184,144 +172,335 @@ function ChatPage() {
   return (
     <Box
       sx={{
-        border: "3px solid grey",
-        borderRadius: 2,
-        padding: 2,
         height: "100vh",
-        display: "flex",
-        flexDirection: "row",
+        display: "grid",
+        gridTemplateColumns: "25% 75%",
         gap: 2,
       }}
     >
-      <Box>
-        <Box>
-          {rooms?.length ? (
-            <List>
-              {rooms.map((room) => {
-                const receiverinRooms: IUser | undefined = room?.users.find(
-                  (user: IUser) => user._id !== currentUserId
-                );
-                if (!receiverinRooms) return null;
-                return (
-                  <ListItem key={room._id}>
-                    <Box onClick={() => handleUserClick(receiverinRooms)}>
-                      <Avatar
-                        onClick={() =>
-                          navigate(`/profile/${receiverinRooms._id}`)
-                        }
-                        sx={{ cursor: "pointer" }}
-                        src={receiverinRooms.avatarUrl}
-                      />
-                      <ListItemText primary={receiverinRooms.username} />
-                    </Box>
-                  </ListItem>
-                );
-              })}
-            </List>
-          ) : (
-            <Typography variant="h6">No rooms</Typography>
-          )}
-        </Box>
-      </Box>
-      <Box
-        sx={{
-          border: "1px solid grey",
-          borderRadius: 2,
-          padding: 2,
-          height: "90vh",
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          justifyContent: "space-between",
-          width: "80%",
-        }}
-      >
-        {!receiverId ? (
-          <Typography variant="h6">Select a user to start chat</Typography>
-        ) : (
-          <>
-            <Typography variant="h6">
-              Write message to {receiverChat?.username || "user"}
-            </Typography>
-            <form onSubmit={handleSubmit}>
-              <Stack
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 2,
-                  alignItems: "center",
-                }}
-              >
-                <TextField
-                  sx={{ width: "50%", textAlign: "center" }}
-                  type="text"
-                  placeholder="Write your Message"
-                  value={value}
-                  onChange={handleChange}
-                  onKeyUp={handleKeyPress}
-                />
-                <Box
+      {/* rooms */}
+      <Box sx={{ borderRight: "1px solid #EFEFEF", overflowY: "auto" }}>
+        {rooms?.length ? (
+          <List sx={{ height: "100%", overflowY: "auto" }}>
+            {rooms.map((room) => {
+              const receiverinRooms: IUser | undefined = room?.users.find(
+                (user: IUser) => user._id !== currentUserId
+              );
+              if (!receiverinRooms) return null;
+              return (
+                <ListItem
+                  key={room._id}
+                  onClick={() => handleUserClick(receiverinRooms)}
                   sx={{
                     display: "flex",
-                    flexDirection: "row",
-                    gap: 2,
-                    justifyContent: "center",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    padding: "10px",
+                    "&:hover": { backgroundColor: "#EFEFEF" },
                   }}
                 >
-                  <MainButton type="submit" buttonText="Send Message" />
-                </Box>
-              </Stack>
-            </form>
-          </>
+                  <Avatar
+                    onClick={() => navigate(`/profile/${receiverinRooms._id}`)}
+                    sx={{
+                      width: 50,
+                      height: 50,
+                      marginRight: 2,
+                      cursor: "pointer",
+                    }}
+                    src={receiverinRooms.avatarUrl}
+                  />
+                  <ListItemText primary={receiverinRooms.username} />
+                </ListItem>
+              );
+            })}
+          </List>
+        ) : (
+          <Typography variant="h6">No rooms</Typography>
         )}
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+        }}
+      >
+        {/*headeer*/}
+        {/*receiver*/}
         <Box
           sx={{
             display: "flex",
-            flexDirection: "row",
-            gap: 6,
-            justifyContent: "center",
+            alignItems: "center",
+            padding: "10px 20px",
+            borderBottom: "1px solid #EFEFEF",
           }}
         >
-          <Card
-            sx={{
-              padding: 5,
-              width: "50%",
-              textAlign: "left",
-              height: "300px",
-              overflow: "auto",
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-            }}
-          >
-            {messages.map((message, i) => (
-              <Box key={i}>
-                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                  {message.user?.username || "unknown"}
-                </Typography>
-                <Avatar
-                  sx={{ cursor: "pointer" }}
-                  src={message.user?.avatarUrl || ""}
-                />
-                <Typography variant="body1">{message.text}</Typography>
-              </Box>
-            ))}
-          </Card>
-
-          <Card
-            sx={{
-              padding: 5,
-              width: "50%",
-              textAlign: "left",
-              height: "300px",
-              overflow: "auto",
-            }}
-          >
-            <Picker onEmojiClick={onEmojiClick} />
-          </Card>
+          {receiverChat && (
+            <>
+              <Avatar
+                src={receiverChat.avatarUrl}
+                sx={{ width: 40, height: 40, marginRight: 2 }}
+              />
+              <Typography variant="h6">
+                {receiverChat?.username || "user"}
+              </Typography>
+            </>
+          )}
         </Box>
+        {!receiverId ? (
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h6" color="textSecondary">
+              Please select a user to start chatting
+            </Typography>
+          </Box>
+        ) : (
+          <>
+            {/* Messages */}
+            <Box
+              sx={{
+                flex: 1,
+                padding: "10px 20px",
+                overflowY: "auto",
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+              }}
+            >
+              {messages.map((message, i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    alignSelf:
+                      message.user?.username === username
+                        ? "flex-end"
+                        : "flex-start",
+                  }}
+                >
+                  <Avatar
+                    sx={{ cursor: "pointer", width: 30, height: 30 }}
+                    src={message.user?.avatarUrl || ""}
+                  />
+                  {/* <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                {message.user?.username || "unknown"}
+              </Typography> */}
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      backgroundColor:
+                        message.user.username === username
+                          ? "#EFEFEF"
+                          : "#4D00FF",
+                      padding: "10px",
+                      borderRadius: "20px",
+                      width: "50%",
+                    }}
+                  >
+                    {message.text}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+            {/* Input */}
+            <Stack
+              sx={{
+                borderTop: "1px solid #EFEFEF",
+                padding: "10px 20px",
+                display: "flex",
+                alignItenss: "center",
+                gap: 2,
+              }}
+            >
+              <TextField
+                fullWidth
+                placeholder="Write your Message..."
+                value={value}
+                onChange={handleChange}
+                onKeyUp={handleKeyPress}
+                sx={{
+                  backgrundColor: "#f1f2f6",
+                  borderRadius: "30px",
+                  width: "100%",
+                  textAlign: "center",
+                }}
+                type="text"
+              />
+              <MainButton
+                type="submit"
+                buttonText="Send"
+                onClick={handleSubmit}
+              />
+              <Box
+                sx={{
+                  // maxHeight: showEmoji ? "300px" : "100px", // Одна строка или полный список?
+                  overflow: "hidden",
+                  transition: "max-height 0.3s ease",
+                  border: "1px solid #ccc",
+                  borderRadius: "8px",
+                }}
+              >
+                <Picker onEmojiClick={onEmojiClick} />
+                {/* <Button onClick={toggleEmoji}>
+                  {showEmoji ? "Hide" : "More Emojis"}
+                </Button> */}
+              </Box>
+              {/* {showEmoji && <Picker onEmojiClick={onEmojiClick} />} */}
+            </Stack>
+          </>
+        )}
       </Box>
     </Box>
+
+    // <Box
+    //   sx={{
+    //     border: "3px solid grey",
+    //     borderRadius: 2,
+    //     padding: 2,
+    //     height: "100vh",
+    //     display: "flex",
+    //     flexDirection: "row",
+    //     gap: 2,
+    //   }}
+    // >
+    //   <Box>
+    //     <Box>
+    //       {rooms?.length ? (
+    //         <List>
+    //           {rooms.map((room) => {
+    //             const receiverinRooms: IUser | undefined = room?.users.find(
+    //               (user: IUser) => user._id !== currentUserId
+    //             );
+    //             if (!receiverinRooms) return null;
+    //             return (
+    //               <ListItem key={room._id}>
+    //                 <Box onClick={() => handleUserClick(receiverinRooms)}>
+    //                   <Avatar
+    //                     onClick={() =>
+    //                       navigate(`/profile/${receiverinRooms._id}`)
+    //                     }
+    //                     sx={{ cursor: "pointer" }}
+    //                     src={receiverinRooms.avatarUrl}
+    //                   />
+    //                   <ListItemText primary={receiverinRooms.username} />
+    //                 </Box>
+    //               </ListItem>
+    //             );
+    //           })}
+    //         </List>
+    //       ) : (
+    //         <Typography variant="h6">No rooms</Typography>
+    //       )}
+    //     </Box>
+    //   </Box>
+    //   <Box
+    //     sx={{
+    //       border: "1px solid grey",
+    //       borderRadius: 2,
+    //       padding: 2,
+    //       height: "90vh",
+    //       display: "flex",
+    //       flexDirection: "column",
+    //       gap: 2,
+    //       justifyContent: "space-between",
+    //       width: "80%",
+    //     }}
+    //   >
+    //     {!receiverId ? (
+    //       <Typography variant="h6">Select a user to start chat</Typography>
+    //     ) : (
+    //       <>
+    //         <Typography variant="h6">
+    //           Write message to {receiverChat?.username || "user"}
+    //         </Typography>
+    //         <form onSubmit={handleSubmit}>
+    //           <Stack
+    //             sx={{
+    //               display: "flex",
+    //               flexDirection: "column",
+    //               gap: 2,
+    //               alignItems: "center",
+    //             }}
+    //           >
+    //             <TextField
+    //               sx={{ width: "50%", textAlign: "center" }}
+    //               type="text"
+    //               placeholder="Write your Message"
+    //               value={value}
+    //               onChange={handleChange}
+    //               onKeyUp={handleKeyPress}
+    //             />
+    //             <Box
+    //               sx={{
+    //                 display: "flex",
+    //                 flexDirection: "row",
+    //                 gap: 2,
+    //                 justifyContent: "center",
+    //               }}
+    //             >
+    //               <MainButton type="submit" buttonText="Send Message" />
+    //             </Box>
+    //           </Stack>
+    //         </form>
+    //       </>
+    //     )}
+    //     <Box
+    //       sx={{
+    //         display: "flex",
+    //         flexDirection: "row",
+    //         gap: 6,
+    //         justifyContent: "center",
+    //       }}
+    //     >
+    //       <Card
+    //         sx={{
+    //           padding: 5,
+    //           width: "50%",
+    //           textAlign: "left",
+    //           height: "300px",
+    //           overflow: "auto",
+    //           display: "flex",
+    //           flexDirection: "column",
+    //           gap: 2,
+    //         }}
+    //       >
+    //         {messages.map((message, i) => (
+    //           <Box key={i}>
+    //             <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+    //               {message.user?.username || "unknown"}
+    //             </Typography>
+    //             <Avatar
+    //               sx={{ cursor: "pointer" }}
+    //               src={message.user?.avatarUrl || ""}
+    //             />
+    //             <Typography variant="body1">{message.text}</Typography>
+    //           </Box>
+    //         ))}
+    //       </Card>
+
+    //       <Card
+    //         sx={{
+    //           padding: 5,
+    //           width: "50%",
+    //           textAlign: "left",
+    //           height: "300px",
+    //           overflow: "auto",
+    //         }}
+    //       >
+    //         <Picker onEmojiClick={onEmojiClick} />
+    //       </Card>
+    //     </Box>
+    //   </Box>
+    // </Box>
   );
 }
 
