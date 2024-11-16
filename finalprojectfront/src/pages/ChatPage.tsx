@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 import Picker from "emoji-picker-react";
 import {
   Box,
@@ -24,7 +24,12 @@ import { IMessage } from "../redux/messageSlice";
 interface Response {
   error?: string;
 }
-// const sockets = io("http://localhost:4003");
+const sockets = io("http://localhost:4003");
+
+// if (location.pathname.includes("/chatpage")) {
+//   const sockets = io.connect("http://localhost:4003");
+// }
+// setSocket(newSocket);
 
 function ChatPage() {
   const dispatch = useAppDispatch();
@@ -39,7 +44,7 @@ function ChatPage() {
   const currentUserId: string | null = useSelector(
     (state: RootState) => state.users.currentUser?._id ?? null
   );
-  // console.log("currentUserId in chat page", currentUserId);
+  console.log("currentUserId in chat page", currentUserId);
 
   useEffect(() => {
     dispatch(showRooms());
@@ -48,121 +53,49 @@ function ChatPage() {
   const rooms: IRoom[] | null = useSelector(
     (state: RootState) => state.rooms.rooms || []
   );
-  // console.log("rooms in chatpage", rooms);
   const room: IRoom | null = rooms.length > 0 ? rooms[0] : null;
-  // console.log("room in chatpage", room);
   const receiver: IUser | undefined = room?.users.find(
     (user: IUser) => user._id !== currentUserId
   );
-  // console.log("correponderId in chatpage", receiver);
+
   const username = receiver?.username;
-  // console.log("username in chatpage", username);
   const avatarUrl = receiver?.avatarUrl;
-  // console.log("avatarUrl in chatpage", avatarUrl);
-  const [socket, setSocket] = useState<Socket | null>(null);
-
-  const handleUserClick = (selectedUser: IUser) => {
-    setReceiverId(selectedUser?._id);
-    navigate(`/ChatPage/${selectedUser._id}`, {
-      state: { receiverId: selectedUser._id },
-    });
-
-    // console.log("Emitting selectedUser with receiverId:", receiverId);
-    //точно ли нужно это комментить? мне нужно открытия нужной комнаты
-    // socket?.emit("selectedtUser", {
-    //   receiverId: selectedUser._id,
-    // });
-  };
+  // const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
-    const locationPath = location.pathname;
-
-    if (
-      locationPath.includes("/chatpage") &&
-      currentUserId
-      // && receiverId
-    ) {
-      const newSocket = io("http://localhost:4003");
-      setSocket(newSocket);
-
-      newSocket.on("connect", () => {
-        if (receiverId) {
-          newSocket.emit("join", { senderId: currentUserId, receiverId });
-          newSocket.emit("getPreviousMessages", {
-            senderId: currentUserId,
-            receiverId,
-          });
-        }
+    if (currentUserId && receiverId) {
+      console.log("Connected to the server", currentUserId, receiverId);
+      sockets.emit("join", {
+        username: receiverId,
+        senderId: currentUserId,
       });
-
-      newSocket.on("message", ({ data }) =>
-        setMessages((prev) => [...prev, data])
-      );
-
-      newSocket.on("previousMessages", (previousMessages) =>
-        setMessages(previousMessages)
-      );
-
-      return () => {
-        if (newSocket) {
-          newSocket.emit("leftRoom", { sender: currentUserId });
-          newSocket.close();
-        }
-      };
+      sockets.emit("getPreviousMessages", {
+        //а не должен ли быть тут on
+        sender: currentUserId,
+        receiver: receiverId,
+      });
     }
+    return () => {
+      sockets.emit("leftRoom", receiverId);
+    };
+  }, [currentUserId, receiverId]);
 
-    // return () => {
-    //   if (socket) {
-    //     socket.emit("leftRoom", { sender: currentUserId });
-    //     socket.close();
-    //     setSocket(null);
-    //   }
-    // };
-  }, [location.pathname, currentUserId, receiverId]);
+  useEffect(() => {
+    sockets.on("message", (message: IMessage) => {
+      console.log("Message received:", message);
+      setMessages((prev) => [...prev, message]);
+    });
+    sockets.on("previousMessages", (previousMessages: IMessage[]) => {
+      console.log("Previous messages received:", previousMessages);
 
-  // useEffect(() => {
-  //   const locationPath = location.pathname;
-  //   if (locationPath.includes("/chatpage") && currentUserId && receiverId) {
-  //     dispatch(userById(receiverId));
-  //     sockets.emit("join", {
-  //       senderId: currentUserId,
-  //       receiverId,
-  //     });
-  //     sockets.emit("getPreviousMessages", {
-  //       senderId: currentUserId,
-  //       receiverId,
-  //     });
-  //   }
-  //   return () => {
-  //     sockets.emit("leftRoom", { sender: currentUserId });
-  //   };
-  // }, [location.search, dispatch, currentUserId, receiverId]);
-
-  // useEffect(() => {
-  //   sockets.on("message", ({ data }) => {
-  //     setMessages((prev) => [...prev, data.user]);
-  //   });
-
-  // sockets.on("startTyping", () => {
-  //   ;
-  //   console.log("start typing");
-  // });
-
-  // sockets.on("stopTyping", () => {
-  //   console.log("stop typing");
-  // });
-
-  //   sockets.on("previousMessages", (previousMessages) => {
-  //     setMessages(previousMessages);
-  //   });
-
-  //   return () => {
-  //     sockets.off("message");
-  //     sockets.off("startTyping");
-  //     sockets.off("stopTyping");
-  //     sockets.off("previousMessages");
-  //   };
-  // }, []);
+      // setMessages((prev) => [...prev, ...previousMessages])
+      setMessages(previousMessages);
+    });
+    return () => {
+      sockets.off("message");
+      sockets.off("previousMessages");
+    };
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
@@ -176,23 +109,13 @@ function ChatPage() {
 
   const handleSubmit = (e: React.FormEvent<HTMLElement>) => {
     e.preventDefault();
-    if (value && receiverId && socket) {
-      socket.emit(
-        "sendMessage",
-        {
-          text: value,
-          receiverId,
-          senderId: currentUserId,
-          chatRoom,
-        },
-
-        (response: Response) => {
-          if (response.error) {
-            console.error("the failor by sending message", response.error);
-          }
-        }
-      );
+    if (value) {
+      sockets.emit("sendMessage", {
+        message: value,
+        receiverId,
+      });
     }
+    console.log("Message sent:", value);
     setValue("");
   };
 
@@ -209,6 +132,17 @@ function ChatPage() {
     setShowEmoji(!showEmoji);
   };
 
+  const handleUserClick = (selectedUser: IUser) => {
+    setReceiverId(selectedUser?._id);
+    console.log("receiverId in handleUserClick:", receiverId);
+    navigate(`/ChatPage/${selectedUser._id}`, {
+      state: { receiverId: selectedUser._id },
+    });
+    sockets.emit("selectedtUser", {
+      receiverId: selectedUser._id,
+    });
+  };
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
   return (
@@ -223,44 +157,15 @@ function ChatPage() {
         gap: 2,
       }}
     >
-      {/* <Drawer
-        anchor="left"
-        open={isDrawerOpen}
-        // onClose={toggleDrawer(false)}
-        PaperProps={{
-          sx: {
-            width: "300px",
-            marginLeft: `${headerWidth}px`,
-          },
-        }}
-      > */}
       <Box>
         <Box>
           {rooms?.length ? (
-            // <List>
-            //   {rooms.map((room) => (
-            //     <ListItem key={room._id}>
-            //       {receiver && (
-            //         <Box onClick={() => handleUserClick(receiver)}>
-            //           <Avatar
-            //             onClick={() => navigate(`/profile/${receiver._id}`)}
-            //             sx={{ cursor: "pointer" }}
-            //             src={avatarUrl}
-            //           />
-            //           <ListItemText primary={username} />
-            //         </Box>
-            //       )}
-            //     </ListItem>
-            //   ))}
-            // </List>
             <List>
               {rooms.map((room) => {
                 const receiverinRooms: IUser | undefined = room?.users.find(
                   (user: IUser) => user._id !== currentUserId
                 );
-
-                if (!receiverinRooms) return null; // Если ресивер не найден, пропускаем комнату
-
+                if (!receiverinRooms) return null;
                 return (
                   <ListItem key={room._id}>
                     <Box onClick={() => handleUserClick(receiverinRooms)}>
@@ -282,7 +187,6 @@ function ChatPage() {
           )}
         </Box>
       </Box>
-      {/* </Drawer> */}
       <Box
         sx={{
           border: "1px solid grey",
@@ -299,35 +203,40 @@ function ChatPage() {
         {!receiverId ? (
           <Typography variant="h6">Select a user to start chat</Typography>
         ) : (
-          <form onSubmit={handleSubmit}>
-            <Stack
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-                alignItems: "center",
-              }}
-            >
-              <TextField
-                sx={{ width: "50%", textAlign: "center" }}
-                type="text"
-                placeholder="Write your Message"
-                value={value}
-                onChange={handleChange}
-                onKeyUp={handleKeyPress}
-              />
-              <Box
+          <>
+            <Typography variant="h6">
+              Write message to {receiver?.username || "user"}
+            </Typography>
+            <form onSubmit={handleSubmit}>
+              <Stack
                 sx={{
                   display: "flex",
-                  flexDirection: "row",
+                  flexDirection: "column",
                   gap: 2,
-                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
-                <MainButton type="submit" buttonText="Send Message" />
-              </Box>
-            </Stack>
-          </form>
+                <TextField
+                  sx={{ width: "50%", textAlign: "center" }}
+                  type="text"
+                  placeholder="Write your Message"
+                  value={value}
+                  onChange={handleChange}
+                  onKeyUp={handleKeyPress}
+                />
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: 2,
+                    justifyContent: "center",
+                  }}
+                >
+                  <MainButton type="submit" buttonText="Send Message" />
+                </Box>
+              </Stack>
+            </form>
+          </>
         )}
         <Box
           sx={{
@@ -350,10 +259,12 @@ function ChatPage() {
             }}
           >
             {messages.map(({ text }, i) => (
-              <div key={i}>
-                {/* <strong>{username}</strong> */}
-                {text}
-              </div>
+              <Box key={i}>
+                {/* <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                  {userName}
+                </Typography> */}
+                <Typography variant="body1">{text}</Typography>
+              </Box>
             ))}
           </Card>
 

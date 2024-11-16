@@ -275,7 +275,7 @@ export const toFollow = async (req: CustomRequest, res: Response) => {
     const userId = req.user?.id;
     const { followingId } = req.body;
 
-    console.log("followingId:", followingId);
+    // console.log("followingId:", followingId);
 
     const following = await User.findById(followingId);
     if (!following) {

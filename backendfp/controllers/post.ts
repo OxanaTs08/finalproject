@@ -227,8 +227,6 @@ export const postsByFollowings = async (req: CustomRequest, res: Response) => {
       return;
     }
     const followings = user.followings || [];
-    console.log(followings);
-
     if (Array.isArray(followings) && followings.length === 0) {
       res.status(200).json({ message: "No followings added by you" });
       return;
