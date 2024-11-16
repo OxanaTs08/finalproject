@@ -34,6 +34,7 @@ const sockets = io("http://localhost:4003");
 function ChatPage() {
   const dispatch = useAppDispatch();
   const [receiverId, setReceiverId] = useState<string | null>(null);
+  const [receiverChat, setReceiverChat] = useState<IUser | null>(null);
   const [chatRoom, setChatRoom] = useState<string | null>(null);
   const location = useLocation();
   const [messages, setMessages] = useState<IMessage[]>([]);
@@ -134,6 +135,7 @@ function ChatPage() {
 
   const handleUserClick = (selectedUser: IUser) => {
     setReceiverId(selectedUser?._id);
+    setReceiverChat(selectedUser);
     console.log("receiverId in handleUserClick:", receiverId);
     navigate(`/ChatPage/${selectedUser._id}`, {
       state: { receiverId: selectedUser._id },
@@ -205,7 +207,7 @@ function ChatPage() {
         ) : (
           <>
             <Typography variant="h6">
-              Write message to {receiver?.username || "user"}
+              Write message to {receiverChat?.username || "user"}
             </Typography>
             <form onSubmit={handleSubmit}>
               <Stack
@@ -261,7 +263,7 @@ function ChatPage() {
             {messages.map(({ text }, i) => (
               <Box key={i}>
                 {/* <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                  {userName}
+                  {receiver.username}
                 </Typography> */}
                 <Typography variant="body1">{text}</Typography>
               </Box>
