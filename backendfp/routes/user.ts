@@ -16,6 +16,8 @@ import {
   showUser,
   updateUser,
   showCurrentUser,
+  resetPasswordLink,
+  createNewPassword,
 } from "../controllers/user";
 import authenticateJWT from "../middleWares/authMiddleWare";
 
@@ -41,4 +43,6 @@ router.put("/deletefollower/:followerId", authenticateJWT, deleteFollower);
 router.get("/userlikes/yourlikes", authenticateJWT, showYourLikes);
 // router.get("/logout", authenticateJWT, logoutController);
 router.get("/search/user", authenticateJWT, searchUsersByName);
+router.post("/resetPasswordLink", resetPasswordLink);
+router.post("/createNewPassword/:token", createNewPassword);
 export default router;

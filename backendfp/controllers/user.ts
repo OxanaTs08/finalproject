@@ -1,10 +1,12 @@
 import { User, IUser } from "../models/userModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import * as crypto from "crypto";
 import dotenv from "dotenv";
 import { RequestHandler, Request, Response } from "express";
 import cloudinary from "../config/cloudinary";
 dotenv.config({ path: ".env" });
+import { sendEmail } from "../utils/sendMail";
 
 const jwtSecret = process.env.JWT_SECRET || "";
 
@@ -55,15 +57,15 @@ export const registerController: RequestHandler = async (req, res) => {
 };
 
 export const loginController: RequestHandler = async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  if (!username || !password) {
-    res.status(400).json({ message: "Username and password are required" });
+  if (!email || !password) {
+    res.status(400).json({ message: "Email and password are required" });
     return;
   }
 
   try {
-    const foundUser = (await User.findOne({ username })) as IUser & {
+    const foundUser = (await User.findOne({ email })) as IUser & {
       _id: string;
     };
 
@@ -494,6 +496,88 @@ export const searchUsersByName = async (req: Request, res: Response) => {
     return;
   } catch (error) {
     res.status(500).json({ error: "Error white search" });
+    return;
+  }
+};
+
+export const resetPasswordLink = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      res.status(400).json({ error: "Email is required" });
+      return;
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpire = new Date(Date.now() + 3600000);
+    await user.save();
+
+    const resetUrl = `${process.env.BASE_URL}/changepassword/${resetToken}`;
+    try {
+      await sendEmail({
+        from: process.env.EMAIL_SITE as string,
+        to: email,
+        subject: "Password Reset",
+        html: `<p>Click <a href="${resetUrl}">here</a> to reset your password.</p>`,
+      });
+      console.log("Email sent successfully");
+    } catch (emailError) {
+      console.error("Error sending email:", emailError);
+      res.status(500).json({ message: "Error sending email" });
+      return;
+    }
+
+    res.status(200).json({ message: "Password reset email sent" });
+    return;
+  } catch (error) {
+    res.status(500).json({ message: error });
+    return;
+  }
+};
+
+export const createNewPassword = async (req: CustomRequest, res: Response) => {
+  try {
+    const { newPassword } = req.body;
+
+    if (!newPassword) {
+      res.status(400).json({ error: "New Password is required" });
+      return;
+    }
+
+    const user = await User.findOne({ resetPasswordToken: req.params.token });
+
+    if (!user) {
+      res.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    if (
+      user.resetPasswordExpire &&
+      user.resetPasswordExpire.getTime() < Date.now()
+    ) {
+      res.status(400).json({ error: "Token Expired" });
+      return;
+    }
+
+    user.password = newPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.status(200).json({ message: "Password is changed successfully" });
+    return;
+  } catch (error) {
+    res.status(500).json({ error: "Error while changing password" });
     return;
   }
 };

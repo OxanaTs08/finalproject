@@ -74,17 +74,51 @@ export const registerUser = createAsyncThunk<
 export const loginUser = createAsyncThunk(
   "user/login",
   async (
-    loginData: { username: string; password: string },
+    loginData: { email: string; password: string },
     { rejectWithValue }
   ) => {
     try {
       const response = await axios.post(`${API_URL}/login`, { ...loginData });
       const { token, user } = response.data;
       localStorage.setItem("token", token);
-      console.log(response.data);
+      // console.log(response.data);
       return { token, user };
     } catch (error: any) {
       // const message = error.response?.data?.message || error.message;
+      return rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
+export const resetPasswordLink = createAsyncThunk(
+  "user/resetPasswordLink",
+  async ({ email }: { email: string }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_URL}/resetPasswordLink`, {
+        email,
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
+export const createNewPassword = createAsyncThunk(
+  "user/createNewPassword/:token",
+  async (
+    { newPassword, token }: { newPassword: string; token: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/createNewPassword/${token}`,
+        {
+          newPassword,
+        }
+      );
+      return response.data;
+    } catch (error: any) {
       return rejectWithValue(error.response.data.message);
     }
   }
@@ -471,6 +505,41 @@ export const userSlice = createSlice({
         state.isError = true;
         state.message = action.payload as string;
       })
+      .addCase(resetPasswordLink.pending, (state) => {
+        state.isLoading = true;
+        state.message = null;
+        state.isError = null;
+      })
+      .addCase(
+        resetPasswordLink.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.isLoading = false;
+          state.message = action.payload.message;
+        }
+      )
+      .addCase(resetPasswordLink.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      })
+      .addCase(createNewPassword.pending, (state) => {
+        state.isLoading = true;
+        state.message = null;
+        state.isError = null;
+      })
+      .addCase(
+        createNewPassword.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.isLoading = false;
+          state.message = action.payload.message;
+        }
+      )
+      .addCase(createNewPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload as string;
+      })
+
       // .addCase(deleteFollowing.pending, (state) => {
       //   state.isLoading = true;
       //   state.isError = false;

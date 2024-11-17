@@ -5,13 +5,14 @@ import {
   TextField,
   styled,
   Divider,
+  Alert,
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
 import MainButton from "../components/MainButton";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser, resetState } from "../redux/userSlice";
+import { loginUser, resetState, resetPasswordLink } from "../redux/userSlice";
 import { useAppDispatch } from "../hooks/useAppDispatch";
 import { RootState } from "../redux/store";
 import Lock from "../assets/Img - Trouble logging in_.svg";
@@ -39,23 +40,32 @@ const ResetPasswordPage = () => {
   const { token, isLoading, isError, message } = useSelector(
     (state: RootState) => state.users
   );
-  const [username, setUsername] = useState("");
-  const [usernameError, setUsernameError] = useState(false);
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setUsername(value);
-    if (!/^[A-Za-z ]+$/.test(value)) {
-      setUsernameError(true);
-    } else {
-      setUsernameError(false);
-    }
+    setEmail(value);
+    setEmailError(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!usernameError) {
-      const loginData = username;
+    try {
+      if (!emailError) {
+        const response = await dispatch(resetPasswordLink({ email: email }));
+        if (response.payload) {
+          alert("Password reset email sent successfully!");
+          navigate("/");
+          setFormError(null);
+        } else {
+          setFormError("Please enter a valid email address.");
+          return;
+        }
+      }
+    } catch (error: any) {
+      setFormError("Please enter a valid email address.");
     }
   };
 
@@ -107,20 +117,18 @@ const ResetPasswordPage = () => {
           <form onSubmit={handleSubmit}>
             <Stack spacing={2} alignItems="center">
               <StyledTextField
-                label="Username"
+                label="Email"
                 fullWidth
                 margin="normal"
-                type="text"
-                value={username}
-                inputProps={{
-                  pattern: "[A-Za-z ]+",
-                }}
-                error={usernameError}
+                type="email"
+                value={email}
+                error={emailError}
                 helperText={
-                  usernameError ? "Your name must contain only letters" : ""
+                  emailError ? "Please enter a valid email address" : ""
                 }
-                onChange={handleNameChange}
+                onChange={handleEmailChange}
               />
+              {formError && <Alert severity="error">{formError}</Alert>}
 
               <MainButton
                 buttonText={"Reset Your Password"}
@@ -136,7 +144,7 @@ const ResetPasswordPage = () => {
               OR
             </Typography>{" "}
           </Divider>
-          <StyledNavLink to="/">
+          <StyledNavLink to="/register">
             {" "}
             <Typography
               sx={{ textAlign: "center", fontSize: "14px", fontWeight: "bold" }}

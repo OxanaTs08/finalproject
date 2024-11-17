@@ -40,25 +40,21 @@ const LogInPage = () => {
   const { token, isLoading, isError, message } = useSelector(
     (state: RootState) => state.users
   );
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [usernameError, setUsernameError] = useState(false);
+  const [emailError, setEmailError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setUsername(value);
-    if (!/^[A-Za-z ]+$/.test(value)) {
-      setUsernameError(true);
-    } else {
-      setUsernameError(false);
-    }
+    setEmail(value);
+    setEmailError(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!usernameError) {
-      const loginData = { username, password };
+    if (!emailError) {
+      const loginData = { email, password };
       dispatch(loginUser(loginData));
     }
   };
@@ -77,7 +73,7 @@ const LogInPage = () => {
     if (!token || !savedToken) {
       dispatch(resetState());
     }
-  }, [token, navigate, dispatch, username]);
+  }, [token, navigate, dispatch, email]);
 
   return (
     <Box
@@ -122,19 +118,16 @@ const LogInPage = () => {
               }}
             >
               <StyledTextField
-                label="Username"
+                label="Email"
                 fullWidth
                 margin="normal"
                 type="text"
-                value={username}
-                inputProps={{
-                  pattern: "[A-Za-z ]+",
-                }}
-                error={usernameError}
+                value={email}
+                error={emailError}
                 helperText={
-                  usernameError ? "Your name must contain only letters" : ""
+                  emailError ? "Your name must contain only letters" : ""
                 }
-                onChange={handleNameChange}
+                onChange={handleEmailChange}
               />
               <StyledTextField
                 label="Password"

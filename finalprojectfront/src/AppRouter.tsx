@@ -13,6 +13,7 @@ import ExplorePage from "./pages/ExplorePage";
 import EditProfile from "./components/EditProfile";
 import PageNotFound from "./pages/PageNotFound";
 import ChatPage from "./pages/ChatPage";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
 // import PrivateRoute from "./PrivateRoute";
 
 const AppRouter = () => {
@@ -23,6 +24,7 @@ const AppRouter = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="*" element={<PageNotFound />} />
         <Route path="/forgotpassword" element={<ResetPasswordPage />} />
+        <Route path="/changepassword/:token" element={<ChangePasswordPage />} />
         <Route path="*" element={<PageNotFound />} />
         {/* <Route element={<PrivateRoute />}> */}
         <Route path="/" element={<Layout />}>
