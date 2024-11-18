@@ -547,18 +547,21 @@ export const resetPasswordLink = async (req: Request, res: Response) => {
 export const createNewPassword = async (req: CustomRequest, res: Response) => {
   try {
     const { newPassword } = req.body;
+    const resetPasswordToken = req.params.token;
+    console.log("req.params.token", resetPasswordToken);
 
     if (!newPassword) {
       res.status(400).json({ error: "New Password is required" });
       return;
     }
-
-    const user = await User.findOne({ resetPasswordToken: req.params.token });
+    const user = await User.findOne({ resetPasswordToken });
+    console.log("user", user);
 
     if (!user) {
       res.status(404).json({ error: "User not found" });
       return;
     }
+    console.log("we make next step");
 
     if (
       user.resetPasswordExpire &&
@@ -567,12 +570,25 @@ export const createNewPassword = async (req: CustomRequest, res: Response) => {
       res.status(400).json({ error: "Token Expired" });
       return;
     }
+    console.log("we make next step 2");
 
     user.password = newPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 
-    await user.save();
+    // await user.save();
+    try {
+      console.log("Saving user...");
+      await user.save();
+      console.log("User saved successfully");
+    } catch (saveError: any) {
+      console.error("Error while saving user:", saveError);
+      res
+        .status(500)
+        .json({ error: `Error while saving user: ${saveError.message}` });
+      return;
+    }
+    console.log("user after save", user);
 
     res.status(200).json({ message: "Password is changed successfully" });
     return;

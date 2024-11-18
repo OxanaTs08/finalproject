@@ -41,7 +41,7 @@ const ChangePasswordPage = () => {
   const { isLoading, isError, message } = useSelector(
     (state: RootState) => state.users
   );
-  const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [matchError, setMatchError] = useState(false);
@@ -49,7 +49,7 @@ const ChangePasswordPage = () => {
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setPassword(value);
+    setNewPassword(value);
     setPasswordError(false);
   };
 
@@ -63,13 +63,15 @@ const ChangePasswordPage = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      if (password !== confirmPassword) {
+      if (newPassword !== confirmPassword) {
         setMatchError(true);
         return;
       }
+      console.log("token", token);
       if (token) {
-        dispatch(createNewPassword({ newPassword: password, token }));
+        dispatch(createNewPassword({ newPassword: newPassword, token }));
         setFormError(null);
+        navigate("/");
       }
     } catch (error) {
       setFormError("Something went wrong. Please try again.");
@@ -127,10 +129,10 @@ const ChangePasswordPage = () => {
                 fullWidth
                 margin="normal"
                 type="password"
-                value={password}
+                value={newPassword}
                 error={passwordError}
                 helperText={
-                  passwordError ? "Your name must contain only letters" : ""
+                  passwordError ? "Password must be at least 8 characters" : ""
                 }
                 onChange={handlePasswordChange}
               />

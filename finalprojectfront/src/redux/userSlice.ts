@@ -105,7 +105,7 @@ export const resetPasswordLink = createAsyncThunk(
 );
 
 export const createNewPassword = createAsyncThunk(
-  "user/createNewPassword/:token",
+  "user/createNewPassword/token",
   async (
     { newPassword, token }: { newPassword: string; token: string },
     { rejectWithValue }
@@ -119,7 +119,7 @@ export const createNewPassword = createAsyncThunk(
       );
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response.data.message);
+      return rejectWithValue(error.response.data.error);
     }
   }
 );

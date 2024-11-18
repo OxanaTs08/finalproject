@@ -43,6 +43,7 @@ const ResetPasswordPage = () => {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [formSuccess, setFormSuccess] = useState<string | null>(null);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -56,7 +57,7 @@ const ResetPasswordPage = () => {
       if (!emailError) {
         const response = await dispatch(resetPasswordLink({ email: email }));
         if (response.payload) {
-          alert("Password reset email sent successfully!");
+          setFormSuccess("Password reset email sent successfully!");
           navigate("/");
           setFormError(null);
         } else {
@@ -129,6 +130,7 @@ const ResetPasswordPage = () => {
                 onChange={handleEmailChange}
               />
               {formError && <Alert severity="error">{formError}</Alert>}
+              {formSuccess && <Alert severity="error">{formSuccess}</Alert>}
 
               <MainButton
                 buttonText={"Reset Your Password"}

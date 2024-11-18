@@ -193,7 +193,7 @@ const PostPage = () => {
               {post?.likes?.length} Likes
             </Typography>
 
-            {/* Описание поста */}
+            {/* Описание  */}
             <Typography variant="body1" sx={{ mb: 2 }}>
               {post?.content}
             </Typography>
@@ -233,128 +233,6 @@ const PostPage = () => {
         </Box>
       </Card>
     </>
-
-    // <>
-    //   <Card sx={{ maxWidth: 800, m: "auto", p: 2, mt: 3 }}>
-    //     <Box sx={{ display: "flex", flexDirection: "row" }}>
-    //       <Box sx={{ width: "50%" }}>
-    //         <CardMedia
-    //           component="img"
-    //           height="500"
-    //           // image={post?.images.join(", ")}
-    //           image={post?.images[0]}
-    //           alt="post"
-    //           sx={{ width: "50%", borderRadius: 2, mb: 2 }}
-    //         />
-    //       </Box>
-    //       <Stack spacing={2} sx={{ width: "50%", p: 2 }}>
-    //         <Paper
-    //           sx={{
-    //             display: "flex",
-    //             alignItems: "center",
-    //             p: 1,
-    //             flexDirection: "row",
-    //           }}
-    //         >
-    //           <Avatar src={user?.avatarUrl}></Avatar>
-    //           <Typography variant="h6" sx={{ ml: 1 }}>
-    //             {user?.username}
-    //           </Typography>
-    //           <IconButton
-    //             aria-label="settings"
-    //             onClick={handleSettings}
-    //             sx={{ ml: "auto" }}
-    //           >
-    //             <MoreVertIcon />
-    //           </IconButton>
-    //         </Paper>
-    //         <Paper>
-    //           <Avatar src={user?.avatarUrl} />
-    //           <Typography variant="h6" sx={{ ml: 1 }}>
-    //             {user?.username}
-    //           </Typography>
-    //           <Typography variant="body1" sx={{ mt: 1 }}>
-    //             {post?.content}
-    //           </Typography>
-    //           <Stack spacing={1}>
-    //             {comments &&
-    //               comments.map((comment) => (
-    //                 <Box
-    //                   key={comment._id}
-    //                   sx={{ display: "flex", alignItems: "center" }}
-    //                 >
-    //                   <Avatar
-    //                     src={commentUserAvatar}
-    //                     sx={{ width: 30, height: 30 }}
-    //                   />
-    //                   <Typography
-    //                     variant="body2"
-    //                     sx={{ ml: 1, fontWeight: 500 }}
-    //                   >
-    //                     {commentUserName}
-    //                   </Typography>
-    //                   <Typography variant="body2" sx={{ ml: 1 }}>
-    //                     {comment?.text}
-    //                   </Typography>
-    //                 </Box>
-    //               ))}
-    //           </Stack>
-    //         </Paper>
-    //         <Stack>
-    //           <Box sx={{ alignItems: "center" }}>
-    //             <IconButton aria-label="like" onClick={handleToggleLike}>
-    //               <FavoriteIcon sx={{ color: isLiked ? "red" : "default" }} />
-    //             </IconButton>
-    //             <IconButton aria-label="comment">
-    //               <CommentIcon />
-    //             </IconButton>
-    //           </Box>
-    //           <Box>
-    //             <Typography>{likesCount} Likes</Typography>
-    //           </Box>
-    //           <Box>
-    //             <TextField
-    //               fullWidth
-    //               variant="outlined"
-    //               size="small"
-    //               placeholder="Add a comment..."
-    //               value={newComment}
-    //               onChange={(e) => setNewComment(e.target.value)}
-    //               sx={{ marginRight: 1 }}
-    //             />
-    //             <Button variant="contained" onClick={handleAddComment}>
-    //               Post
-    //             </Button>
-    //           </Box>
-    //         </Stack>
-    //       </Stack>
-    //     </Box>
-    //   </Card>
-    //   <Dialog
-    //     open={open}
-    //     onClose={handleClose}
-    //     aria-labelledby="alert-dialog-title"
-    //     aria-describedby="alert-dialog-description"
-    //   >
-    //     <DialogContent>
-    //       <Button variant="text">Delete</Button>
-    //       <Divider />
-    //       <StyledNavLink to={"/edit"}>
-    //         <Button variant="text">Edit</Button>
-    //       </StyledNavLink>
-    //       <Divider />
-    //       <Button variant="text" onClick={handleClose}>
-    //         Go to Post
-    //       </Button>
-    //       <Divider />
-    //       <Button variant="text">Copy Link</Button>
-    //       <Divider />
-    //       <Button variant="text" onClick={handleClose}>
-    //         Cancel
-    //       </Button>
-    //     </DialogContent>
-    //   </Dialog>
-    // </>
   );
 };
 

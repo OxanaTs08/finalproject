@@ -1,96 +1,93 @@
-// import { useLocation, useNavigate } from "react-router-dom";
-// import { useEffect, useState } from "react";
-// import { io } from "socket.io-client";
-// import {
-//   Box,
-//   Typography,
-//   ListItem,
-//   List,
-//   Avatar,
-//   ListItemText,
-// } from "@mui/material";
-// import { useSelector } from "react-redux";
-// import { useAppDispatch } from "../hooks/useAppDispatch";
-// import { showRooms, RoomState } from "../redux/roomSlice";
-// import { RootState } from "../redux/store";
-// import { userById } from "../redux/userSlice";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {
+  Box,
+  Typography,
+  ListItem,
+  List,
+  Avatar,
+  ListItemText,
+  Link,
+} from "@mui/material";
+import { useSelector } from "react-redux";
+import { useAppDispatch } from "../hooks/useAppDispatch";
+import { RootState } from "../redux/store";
+import { IUser } from "../redux/userSlice";
+import { IRoom, showRooms } from "../redux/roomSlice";
+import { NavLink } from "react-router-dom";
 
-// const sockets = io("http://localhost:4003");
+function ChatPageUsersList() {
+  const dispatch = useAppDispatch();
 
-// function ChatPageUsersList() {
-//   const dispatch = useAppDispatch();
+  const currentUserId: string | null = useSelector(
+    (state: RootState) => state.users.currentUser?._id ?? null
+  );
+  console.log("currentUserId in chat page", currentUserId);
 
-//   const currentUserId = useSelector(
-//     (state: RootState) => state.users.currentUser?._id
-//   );
+  useEffect(() => {
+    dispatch(showRooms());
+  }, [dispatch]);
 
-//   const rooms: RoomState = useSelector((state: RootState) => state.rooms);
-//   let room = rooms.find((room) => room.users.includes(currentUserId));
-//   if (room) {
-//     const receiver = room.users.filter((user) => user._id !== currentUserId)[0];
-//   }
+  const rooms: IRoom[] | null = useSelector(
+    (state: RootState) => state.rooms.rooms || []
+  );
+  const room: IRoom | null = rooms?.length > 0 ? rooms[0] : null;
+  const receiver: IUser | undefined = room?.users.find(
+    (user: IUser) => user._id !== currentUserId
+  );
+  console.log("receiver in chat page after find", receiver);
+  // const [socket, setSocket] = useState<Socket | null>(null);
 
-//   useEffect(() => {
-//     if (receiver) {
-//       dispatch(userById(receiver));
-//     }
-//   }, [dispatch, receiver]);
+  return (
+    <Box
+      sx={{
+        height: "100vh",
+        display: "grid",
+        gridTemplateColumns: "25% 75%",
+        gap: 2,
+      }}
+    >
+      <Box sx={{ borderRight: "1px solid #EFEFEF", overflowY: "auto" }}>
+        {rooms?.length ? (
+          <List sx={{ height: "100%", overflowY: "auto" }}>
+            {rooms.map((room) => {
+              const receiverinRooms: IUser | undefined = room?.users.find(
+                (user: IUser) => user._id !== currentUserId
+              );
+              if (!receiverinRooms) return null;
+              return (
+                <NavLink to={`/chatpage/${receiverinRooms._id}`}>
+                  <ListItem
+                    key={room._id}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      cursor: "pointer",
+                      padding: "10px",
+                      "&:hover": { backgroundColor: "#EFEFEF" },
+                    }}
+                  >
+                    <Avatar
+                      sx={{
+                        width: 50,
+                        height: 50,
+                        marginRight: 2,
+                        cursor: "pointer",
+                      }}
+                      src={receiverinRooms.avatarUrl}
+                    />
+                    <ListItemText primary={receiverinRooms.username} />
+                  </ListItem>
+                </NavLink>
+              );
+            })}
+          </List>
+        ) : (
+          <Typography variant="h6">No rooms</Typography>
+        )}
+      </Box>
+    </Box>
+  );
+}
 
-//   useEffect(() => {
-//     if (currentUserId) {
-//       dispatch(showRooms());
-//     }
-//   }, [dispatch, currentUserId]);
-
-//   const [receiverId, setReceiverId] = useState<string | null>(null);
-//   const location = useLocation();
-//   const [value, setValue] = useState("");
-//   const navigate = useNavigate();
-
-//   // const handleUserClick = (selectedUser) => {
-//   //   console.log("Selected user in handleuserclick function:", selectedUser);
-
-//   //   if (!selectedUser._id) {
-//   //     console.error("User.id is undefined");
-//   //     return;
-//   //   }
-//   //   dispatch(userReceiver(selectedUser._id));
-//   //   console.log("debug search receiver id:", selectedUser._id);
-
-//   //   const params = new URLSearchParams(location.search);
-//   //   params.set("receiverId", selectedUser._id);
-//   //   navigate({ search: params.toString() });
-
-//   //   console.log("Emitting selectedUser with receiverId:", receiverId);
-//   //   sockets.emit("selectedtUser", {
-//   //     receiverId: selectedUser._id,
-//   //   });
-//   // };
-
-//   return (
-//     <Box>
-//       {rooms.length > 0 ? (
-//         <List>
-//           {rooms.map((room) => (
-//             <ListItem key={room._id}>
-//               {receiver && (
-//                 <>
-//                   <Avatar
-//                     onClick={() => navigate(`/profile/${receiver?._id}`)}
-//                     sx={{ cursor: "pointer" }}
-//                     src={receiver?.avatarUrl}
-//                   />
-//                   <ListItemText primary={receiver.username} />
-//                 </>
-//               )}
-//             </ListItem>
-//           ))}
-//         </List>
-//       ) : (
-//         <Typography variant="h6">No rooms</Typography>
-//       )}
-//     </Box>
-//   );
-// }
-
-// export default ChatPageUsersList;
+export default ChatPageUsersList;
