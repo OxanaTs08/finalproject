@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "./store";
+import { createSelector } from "reselect";
 
 export interface IUser {
   _id: string;
@@ -612,4 +613,10 @@ export const userSlice = createSlice({
 });
 
 export const { resetState, setCurrentUser, setToken } = userSlice.actions;
+
+export const selectCurrentUserId = (state: RootState) =>
+  state.users.currentUser?._id;
+
+export const selectCurrentUser = (state: RootState) => state.users.currentUser;
+
 export default userSlice.reducer;

@@ -3,6 +3,7 @@ import axios from "axios";
 import { RootState } from "./store";
 import { IUser } from "./userSlice";
 import { IPost } from "./postSlice";
+import { createSelector } from "reselect";
 
 export interface IComment {
   _id: string;
@@ -135,4 +136,14 @@ export const commentSlice = createSlice({
 });
 
 export const { resetState } = commentSlice.actions;
+
+export const selectCommentsForPost = createSelector(
+  [
+    (state: RootState) => state.comments.comments,
+    (_, postId: string) => postId,
+  ],
+  (comments, postId) =>
+    comments?.filter((comment) => comment?.post === postId) || []
+);
+
 export default commentSlice.reducer;

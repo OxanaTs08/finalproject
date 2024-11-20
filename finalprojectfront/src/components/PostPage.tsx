@@ -32,7 +32,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, isValid, parseISO } from "date-fns";
 import { useNavigate } from "react-router-dom";
 
 const StyledNavLink = styled(NavLink)(() => ({
@@ -254,9 +254,11 @@ const PostPage = () => {
                 {post?.content}
               </Typography>
               <Typography sx={{ color: "#737373", fontSize: "12px" }}>
-                {formatDistanceToNow(new Date(post?.createdAt ?? ""), {
-                  addSuffix: true,
-                })}
+                {isValid(new Date(post?.createdAt ?? ""))
+                  ? formatDistanceToNow(new Date(post?.createdAt ?? ""), {
+                      addSuffix: true,
+                    })
+                  : "Date is not Valid"}
               </Typography>
             </Stack>
           </Box>
