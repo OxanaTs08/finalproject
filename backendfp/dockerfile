@@ -1,0 +1,25 @@
+# Используем Node.js 18.16 на базе Alpine для меньшего размера образа 
+FROM node:20
+# Задаем рабочий каталог 
+WORKDIR /home/ICH/workprojects/Node.js/app
+# Копируем json файлы и tsconfig 
+# COPY package.json package-lock.json tsconfig.json app.ts ./ 
+COPY ./backendfp .
+
+# Устанавливаем pnpm и проверяем версию 
+RUN npm install
+
+# Устанавливаем зависимости 
+# RUN npm install -g
+
+## Копируем остальные файлы проекта (public, src, vite.config.ts) 
+COPY . .
+
+#Убедитесь, что эта строка присутствует 
+
+## Собираем приложение 
+# RUN npm build 
+# Открываем порт, на котором приложение работает 
+EXPOSE 4001
+# Запускаем приложение 
+CMD ["npm", "start"]

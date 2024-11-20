@@ -8,6 +8,13 @@ import PostCard from "../components/PostCard";
 import { Root } from "react-dom/client";
 import { RootState } from "../redux/store";
 import InfoUpdates from "../components/InfoUpdates";
+import { createSelector } from "reselect";
+import React from "react";
+
+const selectedPosts = createSelector(
+  (state: RootState) => state.posts.posts || [],
+  (posts) => posts.filter((post) => post)
+);
 
 const ListofPosts = () => {
   const dispatch = useAppDispatch();
@@ -28,8 +35,8 @@ const ListofPosts = () => {
     }
   }, [dispatch, currentUserId]);
 
-  const postsData = useSelector((state: RootState) => state.posts);
-  const posts = postsData.posts || [];
+  // const postsData = useSelector((state: RootState) => state.posts);
+  const posts = useSelector(selectedPosts);
 
   return (
     <Box
@@ -54,4 +61,4 @@ const ListofPosts = () => {
   );
 };
 
-export default ListofPosts;
+export default React.memo(ListofPosts);

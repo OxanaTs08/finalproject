@@ -103,7 +103,7 @@ const Header = () => {
         }}
       >
         <Toolbar>
-          <List>
+          <List sx={{ paddingLeft: "20px" }}>
             <img src={Logo} alt="Logo" />
             {menu.map((menuItem, index) => (
               <ListItem key={index} disablePadding>

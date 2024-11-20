@@ -4,6 +4,8 @@ import { RootState } from "./redux/store";
 import { useSelector } from "react-redux";
 import { showCurrentUser } from "./redux/userSlice";
 import { useAppDispatch } from "./hooks/useAppDispatch";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 function App() {
   const dispatch = useAppDispatch();

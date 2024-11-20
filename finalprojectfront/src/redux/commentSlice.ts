@@ -6,9 +6,10 @@ import { IPost } from "./postSlice";
 
 export interface IComment {
   _id: string;
-  post: IPost;
+  post: string;
   user: IUser;
   text: string;
+  createdAt: string;
 }
 
 interface CommentState {

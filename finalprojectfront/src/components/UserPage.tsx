@@ -19,6 +19,10 @@ import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { createNotification } from "../redux/notificationSlice";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 
 const StyledNavLink = styled(NavLink)(() => ({
   color: "rgba(40, 40, 40, 1)",
@@ -82,29 +86,6 @@ const UserPage = () => {
     }
   };
 
-  // const handleToggleFollow = async () => {
-  //   try {
-  //     if (isFollowing) {
-  //       // console.log("followingId in deleting", userId);
-  //       await dispatch(createFollowing({ followingId: userId }));
-  //       setIsFollowing((prev) => !prev);
-  //     } else {
-  //       // console.log("followingId in creating", userId);
-  //       await dispatch(createFollowing({ followingId: userId }));
-  //       setIsFollowing((prev) => !prev);
-  //       await dispatch(
-  //         createNotification({
-  //           post: post,
-  //           user: post.user,
-  //           type: "follow",
-  //         })
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
   const handleOpenChat = () => {
     console.log("current user in handleOpenChat", currentUser);
     console.log("user id in handleOpenChat", userId);
@@ -130,7 +111,7 @@ const UserPage = () => {
           >
             {" "}
             <Avatar
-              sx={{ width: "100px", height: "120px" }}
+              sx={{ width: "100px", height: "100px" }}
               src={user?.avatarUrl}
             ></Avatar>
             <Stack sx={{ flex: 1 }}>
@@ -181,7 +162,7 @@ const UserPage = () => {
 
         <Grid
           container
-          spacing={2}
+          spacing={1}
           justifyContent="center"
           sx={{ marginTop: 3 }}
         >
@@ -189,20 +170,37 @@ const UserPage = () => {
             posts.map((post: IPost) => (
               <Grid item xs={12} sm={6} md={4} key={post._id}>
                 <StyledNavLink to={`/post/${post._id}`}>
-                  <CardMedia
-                    component="img"
-                    height="194"
-                    // image={post.images.join(", ")}
-                    image={post.images[0]}
-                    alt="post"
-                    sx={{
-                      borderRadius: "8px",
-                      transition: "transform 0.3s",
-                      "&:hover": {
-                        transform: "scale(1.05)",
-                      },
-                    }}
-                  />
+                  {post.images.length > 1 ? (
+                    <>
+                      <Swiper
+                        spaceBetween={10}
+                        slidesPerView={1}
+                        loop
+                        navigation
+                        pagination={{ clickable: true }}
+                        modules={[Navigation]}
+                        // autoplay={{ delay: 3000 }}
+                      >
+                        {post.images.map((image, index) => (
+                          <SwiperSlide key={index}>
+                            <CardMedia
+                              component="img"
+                              height="194"
+                              image={`${image}?h=120&fit=crop&auto=format`}
+                              alt={`post image ${index + 1}`}
+                            />
+                          </SwiperSlide>
+                        ))}
+                      </Swiper>
+                    </>
+                  ) : (
+                    <CardMedia
+                      component="img"
+                      height="194"
+                      image={post.images.join(", ")}
+                      alt="post"
+                    />
+                  )}
                 </StyledNavLink>
               </Grid>
             ))
@@ -220,89 +218,3 @@ const UserPage = () => {
   );
 };
 export default UserPage;
-
-// import { Box, Typography, styled } from "@mui/material";
-// import { useNavigate } from "react-router-dom";
-// import { useParams } from "react-router-dom";
-// // import { NavLink } from "react-router-dom";
-// import { IUser, userById, setCurrentUser } from "../redux/userSlice";
-// import MainButton from "./MainButton";
-// import { useDispatch, useSelector } from "react-redux";
-// import { useAppDispatch } from "../hooks/useAppDispatch";
-// import { createFollowing } from "../redux/userSlice";
-// import { useEffect } from "react";
-// import { RootState } from "../redux/store";
-// import { useState } from "react";
-// // import { current } from "@reduxjs/toolkit";
-
-// // const StyledNavLink = styled(NavLink)(() => ({
-// //   color: "rgba(40, 40, 40, 1)",
-// //   textDecoration: "none",
-// //   "&:hover": {
-// //     cursor: "pointer",
-// //     color: "rgba(40, 40, 40, 0.5)",
-// //   },
-// // }));
-// const UserPage = () => {
-//   const dispatch = useAppDispatch();
-//   const { id } = useParams();
-//   const [isFollowing, setIsFollowing] = useState<boolean>(false);
-//   const navigate = useNavigate();
-
-//   const currentUserId = useSelector(
-//     (state: RootState) => state.users.currentUser?._id
-//   );
-//   const currentUser = useSelector(
-//     (state: RootState) => state.users.currentUser
-//   );
-
-//   const user = useSelector((state: RootState) => state.users.user);
-
-//   useEffect(() => {
-//     if (currentUserId) {
-//       dispatch(userById(id as string));
-//     }
-//   }, [id, currentUserId, dispatch]);
-
-//   useEffect(() => {
-//     console.log("Current User:", currentUser);
-//     console.log("User  ID:", id);
-//   }, [currentUser, id]);
-
-//   const handleToggleFollow = async () => {
-//     if (!user?._id) return;
-//     try {
-//       if (isFollowing) {
-//         console.log("followingId in deleting", user?._id);
-//         await dispatch(createFollowing({ followingId: user?._id }));
-//         setIsFollowing(false);
-//       } else {
-//         console.log("followingId in creating", user?._id);
-//         await dispatch(createFollowing({ followingId: user?._id }));
-//         setIsFollowing(true);
-//       }
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   };
-
-//   if (!user) return <Typography>Loading...</Typography>;
-//   if (!user._id) return <Typography>User not found</Typography>;
-
-//   return (
-//     <Box sx={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-//       <Typography sx={{ textAlign: "center" }}>{user.username}</Typography>
-//       {isFollowing && (
-//         <Typography sx={{ textAlign: "center" }}>
-//           You Follow this user
-//         </Typography>
-//       )}
-//       <MainButton
-//         buttonText={isFollowing ? "Unfollow" : "Follow"}
-//         onClick={handleToggleFollow}
-//       />
-//     </Box>
-//   );
-// };
-
-// export default UserPage;

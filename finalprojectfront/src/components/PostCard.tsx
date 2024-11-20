@@ -4,8 +4,6 @@ import {
   Avatar,
   IconButton,
   CardMedia,
-  CardContent,
-  CardActions,
   Stack,
   Box,
   Button,
@@ -23,11 +21,11 @@ import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import { createLike } from "../redux/likeSlice";
 import { createFollowing } from "../redux/userSlice";
-import MainButton from "./MainButton";
 import { createNotification } from "../redux/notificationSlice";
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import { showPostsByFollowings } from "../redux/postSlice";
 import dot from "../assets/•.png";
+import { showAllComments, IComment } from "../redux/commentSlice";
+import React from "react";
 
 const StyledNavLink = styled(NavLink)(() => ({
   color: "rgba(40, 40, 40, 1)",
@@ -40,12 +38,6 @@ const StyledNavLink = styled(NavLink)(() => ({
 
 const PostCard = ({ post }: { post: IPost }) => {
   const dispatch = useAppDispatch();
-  const [isLiked, setIsLiked] = useState<boolean>(false);
-  const [isFollowing, setIsFollowing] = useState<boolean>(false);
-  const [likesCount, setLikesCount] = useState<number>(
-    post.likes !== undefined ? post.likes.length : 0
-  );
-
   const currentUserId = useSelector(
     (state: RootState) => state.users.currentUser?._id
   );
@@ -53,14 +45,17 @@ const PostCard = ({ post }: { post: IPost }) => {
     (state: RootState) => state.users.currentUser
   );
 
+  const [isLiked, setIsLiked] = useState<boolean>(false);
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const [likesCount, setLikesCount] = useState<number>(
+    post.likes !== undefined ? post.likes.length : 0
+  );
+
+  const postId = post?._id;
   const user = post.user;
-  // console.log("user who wrote the post", user);
   const username = user?.username;
   const userId = user?._id;
   const profilePicture = user?.avatarUrl;
-
-  const postId = post?._id;
-  // console.log(postId);
 
   useEffect(() => {
     if (post.likes && currentUserId) {
@@ -73,6 +68,19 @@ const PostCard = ({ post }: { post: IPost }) => {
       setIsFollowing(currentUser.followings.includes(userId));
     }
   }, [currentUser?.followings, userId]);
+
+  useEffect(() => {
+    if (postId) {
+      dispatch(showAllComments(postId));
+    }
+  }, [dispatch]);
+
+  console.log("postId", postId);
+
+  const comments: IComment[] | undefined = useSelector((state: RootState) =>
+    state.comments.comments?.filter((comment) => comment?.post === postId)
+  );
+  console.log("comments", comments);
 
   const handleToggleLike = async () => {
     if (!postId) return;
@@ -128,21 +136,23 @@ const PostCard = ({ post }: { post: IPost }) => {
         sx={{
           maxWidth: 345,
           borderRadius: 1,
-          gap: "10px",
           borderBottom: "1px solid #EFEFEF",
+          paddingBottom: "20px",
         }}
       >
+        {/* header */}
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
             gap: "10px",
+            padding: "10px 0",
           }}
         >
           <StyledNavLink to={`/profile/${user._id}`}>
             <Avatar src={profilePicture} />
-            {/* {!profilePicture && <PersonOutlineOutlinedIcon />} */}
           </StyledNavLink>
+
           <Typography sx={{ fontWeight: "bold" }}>{username}</Typography>
           <img src={dot} alt="" style={{ color: "#737373" }} />
           <Typography sx={{ color: "#737373", fontSize: "12px" }}>
@@ -155,9 +165,10 @@ const PostCard = ({ post }: { post: IPost }) => {
             sx={{ textTransform: "none", fontWeight: "bold" }}
             onClick={handleToggleFollow}
           >
-            Follow
+            Unfollow
           </Button>
         </Box>
+        {/* images */}
 
         <StyledNavLink to={`/post/${post._id}`}>
           <CardMedia
@@ -168,57 +179,90 @@ const PostCard = ({ post }: { post: IPost }) => {
             sx={{ aspectRatio: "1/1", objectFit: "cover" }}
           />
         </StyledNavLink>
-        <StyledNavLink to={`/post/${post._id}`}>
-          <Typography
-            variant="body2"
-            sx={{
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              display: "-webkit-box",
-              WebkitLineClamp: 1,
-              WebkitBoxOrient: "vertical",
-              marginBottom: 2,
-            }}
-          >
-            {post.content}
-          </Typography>
-        </StyledNavLink>
-
-        <Box sx={{ display: "flex", gap: "10px", alignItems: "left" }}>
-          <IconButton aria-label="like" onClick={handleToggleLike}>
-            {isLiked ? (
-              <FavoriteIcon sx={{ color: "red" }} />
-            ) : (
-              <LikeIcon sx={{ color: "black" }} />
-            )}
-          </IconButton>
-          <IconButton aria-label="comment">
-            <img src={CommentIcon} alt="" />
-          </IconButton>
-        </Box>
-
-        <CardContent>
+        {/* like and komment button */}
+        <Stack>
+          <Box sx={{ display: "flex", gap: "10px", alignItems: "left" }}>
+            <IconButton aria-label="like" onClick={handleToggleLike}>
+              {isLiked ? (
+                <FavoriteIcon sx={{ color: "red" }} />
+              ) : (
+                <LikeIcon sx={{ color: "black" }} />
+              )}
+            </IconButton>
+            <IconButton aria-label="comment">
+              <img src={CommentIcon} alt="" />
+            </IconButton>
+          </Box>
           <Typography sx={{ fontWeight: "bold" }}>
             {likesCount} likes
           </Typography>
-          <Typography
+        </Stack>
+
+        {/* text content */}
+        <StyledNavLink to={`/post/${post._id}`}>
+          <Box
             sx={{
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              WebkitLineClamp: 1,
-              WebkitBoxOrient: "vertical",
-              display: "-webkit-box",
-              color: "grey",
+              display: "flex",
+              flexDirection: "row",
+              gap: "7px",
             }}
           >
-            View All Comments ({post?.comments?.length}){" "}
-          </Typography>
-        </CardContent>
+            <Typography sx={{ fontWeight: "bold" }}>{username}</Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                display: "-webkit-box",
+                WebkitLineClamp: 1,
+                WebkitBoxOrient: "vertical",
+                marginBottom: 2,
+              }}
+            >
+              {post.content}
+            </Typography>
+          </Box>
+        </StyledNavLink>
+
+        <Stack sx={{ paddingBottom: "10px" }}>
+          {/* Комментарии */}
+          <Box>
+            {comments && comments.length > 0 ? (
+              [...comments].slice(0, 1).map((comment: IComment) => (
+                <Box alignItems="center" key={comment._id}>
+                  <StyledNavLink to={`/post/${post._id}`}>
+                    <Typography variant="body2" sx={{ ml: 1 }}>
+                      <b>{comment?.user?.username}</b> {comment.text} ...
+                    </Typography>
+                  </StyledNavLink>
+                </Box>
+              ))
+            ) : (
+              <Typography variant="body2" sx={{ color: "gray" }}>
+                No comments yet.
+              </Typography>
+            )}
+          </Box>
+          <StyledNavLink to={`/post/${post._id}`}>
+            <Typography
+              sx={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                WebkitLineClamp: 1,
+                WebkitBoxOrient: "vertical",
+                display: "-webkit-box",
+                color: "grey",
+              }}
+            >
+              View All Comments ({post?.comments?.length}){" "}
+            </Typography>
+          </StyledNavLink>
+        </Stack>
       </Stack>
     </>
   );
 };
 
-export default PostCard;
+export default React.memo(PostCard);

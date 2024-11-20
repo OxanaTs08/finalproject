@@ -28,6 +28,8 @@ import { NavLink } from "react-router-dom";
 import { showAllComments, createComment } from "../redux/commentSlice";
 import CommentIcon from "@mui/icons-material/ModeCommentOutlined";
 import { createNotification } from "../redux/notificationSlice";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
 
 const StyledNavLink = styled(NavLink)(() => ({
   color: "rgba(40, 40, 40, 1)",
@@ -151,13 +153,41 @@ const PostPage = () => {
           <Box sx={{ width: "50%" }}>
             {" "}
             {/* Изображение */}
-            <CardMedia
+            {post && post.images.length > 1 ? (
+              <>
+                <Swiper
+                  spaceBetween={10}
+                  slidesPerView={1}
+                  loop
+                  autoplay={{ delay: 3000 }}
+                >
+                  {post.images.map((image, index) => (
+                    <SwiperSlide key={index}>
+                      <CardMedia
+                        component="img"
+                        height="194"
+                        image={`${image}?h=120&fit=crop&auto=format`}
+                        alt={`post image ${index + 1}`}
+                      />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </>
+            ) : (
+              <CardMedia
+                component="img"
+                height="194"
+                image={post?.images?.join(", ")}
+                alt="post"
+              />
+            )}
+            {/* <CardMedia
               component="img"
               height="500"
               image={post?.images?.[0]}
               alt="Post image"
               sx={{ borderRadius: 2, mb: 2 }}
-            />
+            /> */}
           </Box>
           <Box>
             {/* Верхняя часть */}

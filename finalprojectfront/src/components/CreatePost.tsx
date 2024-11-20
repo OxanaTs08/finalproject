@@ -6,6 +6,7 @@ import {
   DialogTitle,
   TextField,
   styled,
+  Box,
 } from "@mui/material";
 import { createPost } from "../redux/postSlice";
 import { useSelector } from "react-redux";
@@ -102,6 +103,20 @@ const CreatePost = () => {
               multiple
               onChange={handleImageChange}
             />
+            <Box>
+              {images.length > 0 && (
+                <Box>
+                  {images.map((image, index) => (
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`preview-${index}`}
+                      style={{ width: "100px", margin: "5px" }}
+                    />
+                  ))}
+                </Box>
+              )}
+            </Box>
             <StyledTextField
               type="text"
               label="Write your post"

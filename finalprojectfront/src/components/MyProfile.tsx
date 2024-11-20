@@ -19,6 +19,10 @@ import PostCard from "./PostCard";
 import exampleforPost from "../assets/exampleforpost-3.jpeg";
 import { NavLink } from "react-router-dom";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 
 const StyledNavLink = styled(NavLink)(() => ({
   color: "rgba(40, 40, 40, 1)",
@@ -51,16 +55,33 @@ const MyProfile = () => {
 
   return (
     <>
-      <Stack sx={{ gap: "16px" }}>
+      <Stack sx={{ gap: "20px" }}>
         {currentUser && (
-          <Box sx={{ display: "flex", flexDirection: "row", gap: "16px" }}>
-            <Avatar src={currentUser?.avatarUrl}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              gap: "20px",
+              alignItems: "center",
+            }}
+          >
+            <Avatar
+              sx={{ width: "100px", height: "100px" }}
+              src={currentUser?.avatarUrl}
+            >
               {" "}
               {!currentUser.avatarUrl && <PersonOutlineOutlinedIcon />}
             </Avatar>
-            <Stack>
-              <Box sx={{ display: "flex", flexDirection: "row" }}>
-                <Typography>{currentUser.username}</Typography>
+            <Stack sx={{ flex: 1 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
+                <Typography variant="h5">{currentUser.username}</Typography>
                 <MainButton
                   buttonText="Edit Profile"
                   onClick={() => {
@@ -68,7 +89,14 @@ const MyProfile = () => {
                   }}
                 />
               </Box>
-              <Box sx={{ display: "flex", flexDirection: "row" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "20px",
+                  mt: 1,
+                }}
+              >
                 <Typography>{currentUser?.posts?.length} posts</Typography>
                 <Typography>
                   {currentUser?.followings?.length} followings
@@ -77,22 +105,50 @@ const MyProfile = () => {
                   {currentUser?.followers?.length} followers
                 </Typography>
               </Box>
-              <Typography>Description: {currentUser?.description} </Typography>
+              <Typography variant="body1" sx={{ mt: 1 }}>
+                {" "}
+                {currentUser?.description}{" "}
+              </Typography>
             </Stack>
           </Box>
         )}
 
-        <Grid container spacing={2} justifyContent="center">
+        <Grid container spacing={1} justifyContent="center">
           {posts.length > 0 ? (
             posts.map((post: IPost) => (
-              <Grid item xs={12} sm={6} md={3} key={post._id}>
+              <Grid item xs={12} sm={6} md={4} key={post._id}>
                 <StyledNavLink to={`/post/${post._id}`}>
-                  <CardMedia
-                    component="img"
-                    height="194"
-                    image={post.images.join(", ")}
-                    alt="post"
-                  />
+                  {post.images.length > 1 ? (
+                    <>
+                      <Swiper
+                        spaceBetween={10}
+                        slidesPerView={1}
+                        loop
+                        navigation
+                        pagination={{ clickable: true }}
+                        modules={[Navigation]}
+                        // autoplay={{ delay: 3000 }}
+                      >
+                        {post.images.map((image, index) => (
+                          <SwiperSlide key={index}>
+                            <CardMedia
+                              component="img"
+                              height="194"
+                              image={`${image}?h=120&fit=crop&auto=format`}
+                              alt={`post image ${index + 1}`}
+                            />
+                          </SwiperSlide>
+                        ))}
+                      </Swiper>
+                    </>
+                  ) : (
+                    <CardMedia
+                      component="img"
+                      height="194"
+                      image={post.images.join(", ")}
+                      alt="post"
+                    />
+                  )}
                 </StyledNavLink>
               </Grid>
             ))

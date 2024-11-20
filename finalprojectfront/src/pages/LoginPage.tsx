@@ -56,6 +56,8 @@ const LogInPage = () => {
     if (!emailError) {
       const loginData = { email, password };
       dispatch(loginUser(loginData));
+    } else {
+      setErrorMessage("Please enter a valid email address.");
     }
   };
 
@@ -124,9 +126,7 @@ const LogInPage = () => {
                 type="text"
                 value={email}
                 error={emailError}
-                helperText={
-                  emailError ? "Your name must contain only letters" : ""
-                }
+                helperText={emailError ? "Enter a valid email address" : ""}
                 onChange={handleEmailChange}
               />
               <StyledTextField
