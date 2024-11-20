@@ -1,0 +1,36 @@
+services:
+  api:
+    build:
+      context: ./backendfp
+      dockerfile: dockerfile
+    ports:
+      - "4001:4001"
+    # command: --auth --bind_ip 0.0.0.0 для локалки
+    environment:
+      - MONGO_URI=mongodb+srv://kseniats08:Ebw5EHf2wSPSQsmo@cluster0.gyk6ojt.mongodb.net/Finalproject
+      - CLOUDINARY_URL=cloudinary://<924181296368842>:<q9_a6IrUb0eQQG9NJqOBeJPmzyQ>@dv5zkbm91
+      - JWT_SECRET=test123
+      - bcrypt_salt_rounds=10
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL_SITE=hellomessagefromksenia@gmail.com
+      - EMAIL_PORT=587
+      - EMAIL_PASS=uebircvztaozyzcc
+
+  chat:
+    build:
+      context: ./backendchat
+    ports:
+      - "4003:4003"
+    environment:
+      - MONGO_URI=mongodb+srv://kseniats08:Ebw5EHf2wSPSQsmo@cluster0.gyk6ojt.mongodb.net/Finalproject
+      - CLOUDINARY_URL=cloudinary://<924181296368842>:<q9_a6IrUb0eQQG9NJqOBeJPmzyQ>@dv5zkbm91
+      - JWT_SECRET=test123
+      - bcrypt_salt_rounds=10
+
+  frontend:
+    build:
+      context: ./finalprojectfront
+    ports:
+      - "5173:5173"
+      depends_on:
+      - backendfp

@@ -37,12 +37,14 @@ export const registerController: RequestHandler = async (req, res) => {
 
     const hashRounds = 10;
     const hashedPassword = await bcrypt.hash(password, hashRounds);
+    console.log("hashedPassword in regitstration", hashedPassword);
 
     const user = await User.create({
       username,
       email,
       password: hashedPassword,
     });
+    console.log("user saved", user);
     res.status(201).json({ message: "User created", user });
     return;
   } catch (error: any) {
@@ -58,6 +60,7 @@ export const registerController: RequestHandler = async (req, res) => {
 
 export const loginController: RequestHandler = async (req, res) => {
   const { email, password } = req.body;
+  console.log(email, password);
 
   if (!email || !password) {
     res.status(400).json({ message: "Email and password are required" });
@@ -68,13 +71,18 @@ export const loginController: RequestHandler = async (req, res) => {
     const foundUser = (await User.findOne({ email })) as IUser & {
       _id: string;
     };
+    console.log("foundUser", foundUser);
 
     if (!foundUser) {
       res.status(400).send({ message: "User not found" });
       return;
     }
 
+    console.log("foundUser.password", foundUser.password);
+    console.log("Stored password hash length:", foundUser.password.length);
+
     const isPasswordValid = await bcrypt.compare(password, foundUser.password);
+    console.log("isPasswordValid", isPasswordValid);
 
     if (!isPasswordValid) {
       res.status(400).json({ message: "Invalid password" });

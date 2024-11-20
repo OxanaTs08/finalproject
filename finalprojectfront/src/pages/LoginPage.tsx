@@ -162,8 +162,6 @@ const LogInPage = () => {
               Forgot password
             </Typography>{" "}
           </StyledNavLink>
-
-          {isError && <Typography>{message}</Typography>}
         </Stack>
         <Box
           sx={{
