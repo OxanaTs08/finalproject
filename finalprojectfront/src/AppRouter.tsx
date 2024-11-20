@@ -30,9 +30,10 @@ const AppRouter = () => {
         <Route path="/" element={<Layout />}>
           <Route path="/posts" element={<ListofPosts />} />
           <Route path="/create" element={<CreatePost />} />
-          <Route path="/post/:id" element={<PostPage />} />
+          <Route path="/post/:id" element={<ListofPosts />} />
           <Route path="/profile/:id" element={<UserPage />} />
           <Route path="/myprofile" element={<MyProfile />} />
+          <Route path="/myprofile/:id" element={<MyProfile />} />
           <Route path="/explore" element={<ExplorePage />} />
           <Route path="/updateprofile" element={<EditProfile />} />
           <Route path="/chatpage" element={<ChatPage />} />

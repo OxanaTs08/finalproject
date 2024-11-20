@@ -74,6 +74,7 @@ const LogInPage = () => {
     const savedToken = localStorage.getItem("token");
     if (!token || !savedToken) {
       dispatch(resetState());
+      navigate("/");
     }
   }, [token, navigate, dispatch, email]);
 

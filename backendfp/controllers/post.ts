@@ -168,7 +168,7 @@ export const postById = async (req: CustomRequest, res: Response) => {
       return;
     }
 
-    const post = await Post.findById(id);
+    const post = await Post.findById(id).populate("user");
     if (!post) {
       res.status(404).json({ message: `Post with ${id} not found` });
       return;

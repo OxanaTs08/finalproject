@@ -190,6 +190,27 @@ export const postsByAnotherUser = createAsyncThunk(
   }
 );
 
+export const deletePost = createAsyncThunk(
+  "/delete/:id",
+  async (id: string, { getState, rejectWithValue }) => {
+    try {
+      const token =
+        (getState() as RootState).users.token || localStorage.getItem("token");
+      if (!token) {
+        return rejectWithValue("Authorization token is missing");
+      }
+      const response = await axios.delete(`${API_URL}/delete/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
 export const postSlice = createSlice({
   name: "posts",
   initialState,
@@ -302,6 +323,23 @@ export const postSlice = createSlice({
         }
       )
       .addCase(postsByAnotherUser.rejected, (state, action) => {
+        state.isLoading = false;
+        if (state.isError !== null) {
+          state.isError = true;
+          state.message = action.payload as string;
+        }
+      })
+      .addCase(deletePost.pending, (state) => {
+        state.isLoading = true;
+        state.isError = false;
+      })
+      .addCase(deletePost.fulfilled, (state, actions) => {
+        state.isLoading = false;
+        state.posts = state.posts?.filter(
+          (post) => post._id !== actions.payload._id
+        );
+      })
+      .addCase(deletePost.rejected, (state, action) => {
         state.isLoading = false;
         if (state.isError !== null) {
           state.isError = true;
