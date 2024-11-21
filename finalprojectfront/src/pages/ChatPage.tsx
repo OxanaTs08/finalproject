@@ -19,19 +19,12 @@ import { useAppDispatch } from "../hooks/useAppDispatch";
 import { RootState } from "../redux/store";
 import { IUser } from "../redux/userSlice";
 import { IRoom, showRooms } from "../redux/roomSlice";
-// import { IMessage } from "../redux/messageSlice";
+import { IMessage, showAllMessages } from "../redux/messageSlice";
 
 interface Response {
   error?: string;
 }
 const sockets = io("http://localhost:4003");
-
-interface IMessage {
-  text: string;
-  user: {
-    id: string;
-  };
-}
 
 function ChatPage() {
   const dispatch = useAppDispatch();
@@ -63,6 +56,16 @@ function ChatPage() {
   );
 
   useEffect(() => {
+    if (chatRoom) {
+      dispatch(showAllMessages(chatRoom));
+    }
+  }, [dispatch, chatRoom]);
+
+  const previousMessages: IMessage[] | null = useSelector(
+    (state: RootState) => state.messages.messages || []
+  );
+
+  useEffect(() => {
     if (currentUserId && receiverId) {
       sockets.emit("join", {
         currentUserId,
@@ -78,16 +81,14 @@ function ChatPage() {
 
   useEffect(() => {
     sockets.on("message", (data) => {
-      console.log("Message received in useeffect:", data);
+      console.log("Message received in useEffect:", data);
       setMessages((prev) => [
         ...prev,
         {
           text: data.text,
-          user: {
-            id: data.sender,
-            // username: data.sender.username,
-            // avatarUrl: data.sender.avatarUrl,
-          },
+          sender: data.sender,
+          receiver: data.receiver,
+          chatRoom: data.room,
         },
       ]);
     });
