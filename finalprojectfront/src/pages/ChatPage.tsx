@@ -29,8 +29,7 @@ const sockets = io("http://localhost:4003");
 interface IMessage {
   text: string;
   user: {
-    username: string;
-    avatarUrl: string;
+    id: string;
   };
 }
 
@@ -50,6 +49,11 @@ function ChatPage() {
   );
   console.log("currentUserId in chat page", currentUserId);
 
+  const currentUser: IUser | null = useSelector(
+    (state: RootState) => state.users.currentUser || null
+  );
+  console.log("currentUser in chat page", currentUser);
+
   useEffect(() => {
     dispatch(showRooms());
   }, [dispatch]);
@@ -57,55 +61,39 @@ function ChatPage() {
   const rooms: IRoom[] | null = useSelector(
     (state: RootState) => state.rooms.rooms || []
   );
-  const room: IRoom | null = rooms?.length > 0 ? rooms[0] : null;
-  const receiver: IUser | undefined = room?.users.find(
-    (user: IUser) => user._id !== currentUserId
-  );
-  console.log("receiver in chat page after find", receiver);
-  // const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
     if (currentUserId && receiverId) {
-      console.log("Connected to the server", currentUserId, receiverId);
       sockets.emit("join", {
-        username: username,
-        avatarUrl: avatarUrl,
-        senderId: currentUserId,
-      });
-      sockets.emit("getPreviousMessages", {
-        sender: currentUserId,
-        receiver: receiverId,
+        currentUserId,
+        receiverId,
       });
     }
+    console.log("Connected to the server", currentUserId, receiverId);
     return () => {
-      sockets.emit("leftRoom", receiverId);
+      sockets.off("joinRoom");
+      sockets.off("message");
     };
   }, [currentUserId, receiverId]);
 
   useEffect(() => {
-    sockets.on("message", ({ data }) => {
-      console.log("Message received:", data);
+    sockets.on("message", (data) => {
+      console.log("Message received in useeffect:", data);
       setMessages((prev) => [
         ...prev,
         {
-          text: data.user.message,
+          text: data.text,
           user: {
-            username: data.user.username || "unknown",
-            avatarUrl: data.user.avatarUrl || "",
+            id: data.sender,
+            // username: data.sender.username,
+            // avatarUrl: data.sender.avatarUrl,
           },
         },
       ]);
     });
 
-    sockets.on("previousMessages", (previousMessages: IMessage[]) => {
-      console.log("Previous messages received:", previousMessages);
-
-      // setMessages((prev) => [...prev, ...previousMessages])
-      setMessages(previousMessages);
-    });
     return () => {
       sockets.off("message");
-      sockets.off("previousMessages");
     };
   }, []);
 
@@ -128,14 +116,31 @@ function ChatPage() {
   );
   console.log("username in chat page", username);
 
+  const handleUserClick = (selectedUser: IUser, room: IRoom) => {
+    setReceiverId(selectedUser?._id);
+    setReceiverChat(selectedUser);
+    setChatRoom(room?._id);
+    console.log("receiverId in handleUserClick:", receiverId);
+    console.log("room in handleUserClick:", chatRoom);
+    navigate(`/ChatPage/${selectedUser._id}`, {
+      state: { receiverId: selectedUser._id },
+    });
+  };
+
   const handleSubmit = () => {
+    console.log("click");
+    console.log(
+      "sender, receiver, room in handleSubmit",
+      currentUserId,
+      receiverId,
+      chatRoom
+    );
     if (value) {
       sockets.emit("sendMessage", {
         message: value,
-        //new added
-        username,
-        avatarUrl,
-        receiverId,
+        sender: currentUserId,
+        receiver: receiverId,
+        room: chatRoom,
       });
     }
     console.log("Message sent:", value);
@@ -153,18 +158,6 @@ function ChatPage() {
 
   const toggleEmoji = () => {
     setShowEmoji(!showEmoji);
-  };
-
-  const handleUserClick = (selectedUser: IUser) => {
-    setReceiverId(selectedUser?._id);
-    setReceiverChat(selectedUser);
-    console.log("receiverId in handleUserClick:", receiverId);
-    navigate(`/ChatPage/${selectedUser._id}`, {
-      state: { receiverId: selectedUser._id },
-    });
-    sockets.emit("selectedtUser", {
-      receiverId: selectedUser._id,
-    });
   };
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
@@ -190,7 +183,7 @@ function ChatPage() {
               return (
                 <ListItem
                   key={room._id}
-                  onClick={() => handleUserClick(receiverinRooms)}
+                  onClick={() => handleUserClick(receiverinRooms, room)}
                   sx={{
                     display: "flex",
                     alignItems: "center",
@@ -277,33 +270,29 @@ function ChatPage() {
             >
               {messages.map((message, i) => (
                 <Box
-                  key={i}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 2,
-                    alignSelf:
-                      message.user?.username === username
-                        ? "flex-end"
-                        : "flex-start",
-                  }}
+                // key={i}
+                // sx={{
+                //   display: "flex",
+                //   alignItems: "center",
+                //   gap: 2,
+                //   alignSelf:
+                //     message.user?.username === username
+                //       ? "flex-end"
+                //       : "flex-start",
+                // }}
                 >
-                  <Avatar
-                    sx={{ cursor: "pointer", width: 30, height: 30 }}
-                    src={message.user?.avatarUrl || ""}
-                  />
                   <Typography
-                    variant="body1"
-                    sx={{
-                      backgroundColor:
-                        message.user.username === username
-                          ? "#EFEFEF"
-                          : "#4D00FF",
-                      padding: "10px",
-                      borderRadius: "20px",
-                      maxWidth: "70%",
-                      wordWrap: "break-word",
-                    }}
+                  // variant="body1"
+                  // sx={{
+                  //   backgroundColor:
+                  //     message.user.username === username
+                  //       ? "#EFEFEF"
+                  //       : "#4D00FF",
+                  //   padding: "10px",
+                  //   borderRadius: "20px",
+                  //   maxWidth: "70%",
+                  //   wordWrap: "break-word",
+                  // }}
                   >
                     {message.text}
                   </Typography>

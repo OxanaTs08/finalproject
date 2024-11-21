@@ -3,6 +3,7 @@ import mongoose, { Document, Schema, Model } from "mongoose";
 interface IMessage extends Document {
   sender: mongoose.Types.ObjectId;
   receiver: mongoose.Types.ObjectId;
+  room: mongoose.Types.ObjectId;
   text: string;
   createdAt: Date;
 }
@@ -17,6 +18,11 @@ const messageSchema: Schema<IMessage> = new Schema(
     receiver: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
+    },
+    room: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Room",
       required: true,
     },
     text: {
