@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "./store";
 import { IUser } from "./userSlice";
+import { createSelector } from "reselect";
 
 export interface IPost {
   _id: string;
@@ -350,4 +351,9 @@ export const postSlice = createSlice({
 });
 
 export const { resetState } = postSlice.actions;
+
+export const selectedPosts = createSelector(
+  (state: RootState) => state.posts.posts || [],
+  (posts) => posts.filter((post) => post)
+);
 export default postSlice.reducer;

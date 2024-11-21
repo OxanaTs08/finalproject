@@ -258,7 +258,7 @@ const PostCard = ({ post }: { post: IPost }) => {
           {/* Комментарии */}
           <Box>
             {comments && comments.length > 0 ? (
-              [...comments].slice(0, 1).map((comment: IComment) => (
+              comments.slice(0, 1).map((comment: IComment) => (
                 <Box alignItems="center" key={comment._id}>
                   <StyledNavLink to={`/post/${post._id}`}>
                     <Typography variant="body2" sx={{ ml: 1 }}>
@@ -285,7 +285,7 @@ const PostCard = ({ post }: { post: IPost }) => {
                 color: "grey",
               }}
             >
-              View All Comments ({post?.comments?.length}){" "}
+              View All Comments ({post?.comments?.length})
             </Typography>
           </StyledNavLink>
         </Stack>

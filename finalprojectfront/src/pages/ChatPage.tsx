@@ -269,6 +269,7 @@ function ChatPage() {
                 flex: 1,
                 padding: "10px 20px",
                 overflowY: "auto",
+                maxHeight: "100%",
                 display: "flex",
                 flexDirection: "column",
                 gap: 2,
@@ -291,9 +292,6 @@ function ChatPage() {
                     sx={{ cursor: "pointer", width: 30, height: 30 }}
                     src={message.user?.avatarUrl || ""}
                   />
-                  {/* <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-                {message.user?.username || "unknown"}
-              </Typography> */}
                   <Typography
                     variant="body1"
                     sx={{
@@ -303,7 +301,8 @@ function ChatPage() {
                           : "#4D00FF",
                       padding: "10px",
                       borderRadius: "20px",
-                      width: "50%",
+                      maxWidth: "70%",
+                      wordWrap: "break-word",
                     }}
                   >
                     {message.text}
@@ -340,6 +339,7 @@ function ChatPage() {
                 buttonText="Send"
                 onClick={handleSubmit}
               />
+              {/* emoji */}
               <Box
                 sx={{
                   // maxHeight: showEmoji ? "300px" : "100px", // Одна строка или полный список?
@@ -360,147 +360,6 @@ function ChatPage() {
         )}
       </Box>
     </Box>
-
-    // <Box
-    //   sx={{
-    //     border: "3px solid grey",
-    //     borderRadius: 2,
-    //     padding: 2,
-    //     height: "100vh",
-    //     display: "flex",
-    //     flexDirection: "row",
-    //     gap: 2,
-    //   }}
-    // >
-    //   <Box>
-    //     <Box>
-    //       {rooms?.length ? (
-    //         <List>
-    //           {rooms.map((room) => {
-    //             const receiverinRooms: IUser | undefined = room?.users.find(
-    //               (user: IUser) => user._id !== currentUserId
-    //             );
-    //             if (!receiverinRooms) return null;
-    //             return (
-    //               <ListItem key={room._id}>
-    //                 <Box onClick={() => handleUserClick(receiverinRooms)}>
-    //                   <Avatar
-    //                     onClick={() =>
-    //                       navigate(`/profile/${receiverinRooms._id}`)
-    //                     }
-    //                     sx={{ cursor: "pointer" }}
-    //                     src={receiverinRooms.avatarUrl}
-    //                   />
-    //                   <ListItemText primary={receiverinRooms.username} />
-    //                 </Box>
-    //               </ListItem>
-    //             );
-    //           })}
-    //         </List>
-    //       ) : (
-    //         <Typography variant="h6">No rooms</Typography>
-    //       )}
-    //     </Box>
-    //   </Box>
-    //   <Box
-    //     sx={{
-    //       border: "1px solid grey",
-    //       borderRadius: 2,
-    //       padding: 2,
-    //       height: "90vh",
-    //       display: "flex",
-    //       flexDirection: "column",
-    //       gap: 2,
-    //       justifyContent: "space-between",
-    //       width: "80%",
-    //     }}
-    //   >
-    //     {!receiverId ? (
-    //       <Typography variant="h6">Select a user to start chat</Typography>
-    //     ) : (
-    //       <>
-    //         <Typography variant="h6">
-    //           Write message to {receiverChat?.username || "user"}
-    //         </Typography>
-    //         <form onSubmit={handleSubmit}>
-    //           <Stack
-    //             sx={{
-    //               display: "flex",
-    //               flexDirection: "column",
-    //               gap: 2,
-    //               alignItems: "center",
-    //             }}
-    //           >
-    //             <TextField
-    //               sx={{ width: "50%", textAlign: "center" }}
-    //               type="text"
-    //               placeholder="Write your Message"
-    //               value={value}
-    //               onChange={handleChange}
-    //               onKeyUp={handleKeyPress}
-    //             />
-    //             <Box
-    //               sx={{
-    //                 display: "flex",
-    //                 flexDirection: "row",
-    //                 gap: 2,
-    //                 justifyContent: "center",
-    //               }}
-    //             >
-    //               <MainButton type="submit" buttonText="Send Message" />
-    //             </Box>
-    //           </Stack>
-    //         </form>
-    //       </>
-    //     )}
-    //     <Box
-    //       sx={{
-    //         display: "flex",
-    //         flexDirection: "row",
-    //         gap: 6,
-    //         justifyContent: "center",
-    //       }}
-    //     >
-    //       <Card
-    //         sx={{
-    //           padding: 5,
-    //           width: "50%",
-    //           textAlign: "left",
-    //           height: "300px",
-    //           overflow: "auto",
-    //           display: "flex",
-    //           flexDirection: "column",
-    //           gap: 2,
-    //         }}
-    //       >
-    //         {messages.map((message, i) => (
-    //           <Box key={i}>
-    //             <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
-    //               {message.user?.username || "unknown"}
-    //             </Typography>
-    //             <Avatar
-    //               sx={{ cursor: "pointer" }}
-    //               src={message.user?.avatarUrl || ""}
-    //             />
-    //             <Typography variant="body1">{message.text}</Typography>
-    //           </Box>
-    //         ))}
-    //       </Card>
-
-    //       <Card
-    //         sx={{
-    //           padding: 5,
-    //           width: "50%",
-    //           textAlign: "left",
-    //           height: "300px",
-    //           overflow: "auto",
-    //         }}
-    //       >
-    //         <Picker onEmojiClick={onEmojiClick} />
-    //       </Card>
-    //     </Box>
-    //   </Box>
-    // </Box>
   );
 }
 

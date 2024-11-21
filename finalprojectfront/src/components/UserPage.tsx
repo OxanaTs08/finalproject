@@ -49,6 +49,10 @@ const UserPage = () => {
   const user = useSelector((state: RootState) => state.users.user);
   console.log("id", id);
 
+  const [followerCount, setFollowerCount] = useState<number>(
+    user?.followers !== undefined ? user.followers.length : 0
+  );
+
   const postsData = useSelector((state: RootState) => state.posts);
   const posts = postsData.posts || [];
 
@@ -75,11 +79,13 @@ const UserPage = () => {
         if (!userId) return;
         await dispatch(createFollowing({ followingId: userId }));
         setIsFollowing(false);
+        setFollowerCount((prevCount) => prevCount - 1);
       } else {
         if (!userId) return;
         console.log("followingId in creating", userId);
         await dispatch(createFollowing({ followingId: userId }));
         setIsFollowing(true);
+        setFollowerCount((prevCount) => prevCount + 1);
       }
     } catch (error) {
       console.error(error);
@@ -151,7 +157,7 @@ const UserPage = () => {
               >
                 <Typography>{user?.posts?.length} posts</Typography>
                 <Typography>{user?.followings?.length} followings</Typography>
-                <Typography>{user?.followers?.length} followers</Typography>
+                <Typography>{followerCount} followers</Typography>
               </Box>
               <Typography variant="body1" sx={{ mt: 1 }}>
                 {user.description}

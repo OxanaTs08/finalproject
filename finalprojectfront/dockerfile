@@ -1,29 +1,7 @@
-# Шаг 1: Строим приложение
-FROM node:20 AS build
-
-# Рабочая директория внутри контейнера
+FROM node:20
 WORKDIR /app
-
-# Копируем package.json и package-lock.json
-COPY package*.json ./
-
-# Устанавливаем зависимости
+COPY package*.json .
 RUN npm install
-
-# Копируем все файлы проекта
 COPY . .
-
-# Строим приложение
-RUN npm run build
-
-# Шаг 2: Настройка для продакшн-сервера (Nginx)
-FROM nginx:alpine
-
-# Копируем собранные файлы из предыдущего шага в Nginx
-COPY --from=build /app/dist /usr/share/nginx/html
-
-# Экспонируем порт для доступа к приложению
 EXPOSE 5173
-
-# Запускаем Nginx
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm","run","dev"]

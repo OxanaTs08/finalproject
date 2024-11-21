@@ -59,7 +59,7 @@ const PostPage = () => {
   const currentUser = useSelector(
     (state: RootState) => state.users.currentUser
   );
-  console.log("Current user", currentUser);
+  // console.log("Current user", currentUser);
 
   const { id } = useParams();
 
@@ -73,11 +73,11 @@ const PostPage = () => {
   const postData = useSelector((state: RootState) => state.posts);
   const posts = postData.posts || [];
   const post = posts.find((post) => post._id === id);
-  console.log("post", post);
+  // console.log("post", post);
   const user = post?.user?._id === currentUserId ? currentUser : post?.user;
-  console.log("user in post", user);
+  // console.log("user in post", user);
   const postId = post?._id;
-  console.log("postId", postId);
+  // console.log("postId", postId);
 
   const [likesCount, setLikesCount] = useState<number>(
     post?.likes !== undefined ? post?.likes.length : 0

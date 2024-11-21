@@ -1,5 +1,9 @@
 import { Box, Grid } from "@mui/material";
-import { IPost, showPostsByFollowings } from "../redux/postSlice";
+import {
+  IPost,
+  showPostsByFollowings,
+  selectedPosts,
+} from "../redux/postSlice";
 import { IUser, userById } from "../redux/userSlice";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,11 +15,6 @@ import InfoUpdates from "../components/InfoUpdates";
 import { createSelector } from "reselect";
 import React from "react";
 
-const selectedPosts = createSelector(
-  (state: RootState) => state.posts.posts || [],
-  (posts) => posts.filter((post) => post)
-);
-
 const ListofPosts = () => {
   const dispatch = useAppDispatch();
   const currentUserId = useSelector(
@@ -25,6 +24,10 @@ const ListofPosts = () => {
     (state: RootState) => state.users.currentUser
   );
   // console.log("Current user", currentUser);
+  // const selectedPosts = createSelector(
+  //   (state: RootState) => state.posts.posts || [],
+  //   (posts) => posts.filter((post) => post)
+  // );
 
   useEffect(() => {
     window.scrollTo(0, 0);
