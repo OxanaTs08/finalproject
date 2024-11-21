@@ -9,7 +9,7 @@ import { IUser, User } from "./models/userModel";
 const connectedUsers: Set<string> = new Set();
 
 export const initializedSocket = (io: Server) => {
-  io.on("connection", async (socket) => {
+  io.on("connection", async (socket): Promise<void> => {
     socket.on("join", async ({ currentUserId, receiverId }) => {
       console.log(
         "currentUserId, receiverId in joinRoom",
@@ -58,16 +58,7 @@ export const initializedSocket = (io: Server) => {
         room: room,
       });
 
-      console.log("Emitting message event with data:", {
-        text: message,
-        sender: {
-          _id: sender,
-          // username: sender.username,
-          // avatarUrl: sender.avatarUrl,
-        },
-        receiver: receiver,
-        room: room,
-      });
+      console.log("Emitting message event with data:", message);
     });
 
     socket.on("disconnect", () => {
