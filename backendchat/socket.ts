@@ -51,7 +51,7 @@ export const initializedSocket = (io: Server) => {
         $push: { messages: newMessage._id },
       });
 
-      io.to(room).emit("message", {
+      io.to(room?._id as string).emit("message", {
         text: message,
         sender,
         receiver: receiver,

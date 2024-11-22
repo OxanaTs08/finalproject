@@ -570,6 +570,7 @@ export const createNewPassword = async (req: CustomRequest, res: Response) => {
       return;
     }
     console.log("we make next step");
+  
 
     if (
       user.resetPasswordExpire &&
@@ -580,7 +581,10 @@ export const createNewPassword = async (req: CustomRequest, res: Response) => {
     }
     console.log("we make next step 2");
 
-    user.password = newPassword;
+    const hashRounds = 10; 
+    const hashedPassword = await bcrypt.hash(newPassword, hashRounds); 
+
+    user.password = hashedPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
 
