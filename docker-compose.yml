@@ -19,6 +19,7 @@ services:
   chat:
     build:
       context: ./backendchat
+      dockerfile: dockerfile
     ports:
       - "4003:4003"
     environment:
@@ -30,6 +31,7 @@ services:
   frontend:
     build:
       context: ./finalprojectfront
+      dockerfile: dockerfile
     ports:
       - "5173:5173"
       depends_on:
